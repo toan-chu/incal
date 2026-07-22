@@ -1,0 +1,10 @@
+{
+  "name": "trustana-incentive-calculator",
+  "version": "0.1.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test": "node --test test/v3_core.test.js test/v3_acceptance.test.js test/v3_scenario.test.js test/export_regression.test.js test/formula_canvas.test.js",
+    "qa": "node scripts/app_browser_runner.js"
+  }
+}

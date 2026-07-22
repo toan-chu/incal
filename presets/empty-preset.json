@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 3,
+  "id": "EMPTY-PRESET",
+  "name": "Bộ công thức mới",
+  "version": "1.0.0",
+  "sourceSchema": null,
+  "bindings": {},
+  "fieldLabels": {},
+  "recipes": []
+}

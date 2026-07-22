@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Trustana - Tính Incentive</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand-lockup" href="#" aria-label="Trustana Incentive">
+      <img id="brandLogo" src="assets/Logo_Trustana_PNGPurpleOrange.png" alt="Trustana">
+      <span><strong id="brandCompany">Incentive</strong><small id="brandProduct">Workspace cho FIN</small></span>
+    </a>
+    <nav class="tabs" role="tablist" aria-label="Quy trình tính Incentive">
+      <button class="tab active" role="tab" aria-selected="true" aria-controls="tab-input" data-tab="input"><span>1</span> Input</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="tab-formulas" data-tab="formulas"><span>2</span> Công thức</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="tab-calculate" data-tab="calculate"><span>3</span> Tính</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="tab-dashboard" data-tab="dashboard"><span>4</span> Dashboard</button>
+    </nav>
+    <div class="header-actions">
+      <label class="period-field" for="quarterInput" title="Kỳ báo cáo được ghi vào tên file và nội dung file xuất; đổi kỳ không tự tính lại số liệu."><span>Kỳ báo cáo</span><input id="quarterInput" value="Q1-2026" aria-label="Kỳ báo cáo xuất file"></label>
+    </div>
+  </header>
+
+  <main>
+    <section id="tab-input" class="tab-panel active" role="tabpanel" tabindex="0">
+      <div class="page-heading">
+      <div><p class="eyebrow">DỮ LIỆU ĐẦU VÀO</p><h1>Mỗi sheet là một bảng</h1><p>Kiểm tra header và kiểu dữ liệu. Đối tượng cần tính được chọn ở bước Tính; dữ liệu chỉ sống trong phiên hiện tại.</p></div>
+      </div>
+
+      <label id="excelDropzone" class="dropzone" tabindex="0">
+        <input id="excelInput" type="file" accept=".xlsx,.xls">
+        <span class="drop-mark">XL</span>
+        <span class="drop-copy"><strong>Kéo file Excel nhiều sheet vào đây</strong><small>Mỗi sheet trở thành một bảng dùng được, không có sheet bị ép bỏ qua</small></span>
+        <span class="button primary">Chọn Excel</span>
+      </label>
+
+      <section id="inputStatus" class="status-banner neutral" aria-live="polite">
+        <span class="status-icon">○</span><div><strong>Chưa có workbook</strong><p>Nạp file để app đọc sheet và header.</p></div>
+        <button id="adoptSchema" class="button accent" type="button" hidden>Ướm schema file này</button>
+      </section>
+
+      <div class="metric-row input-metrics">
+        <article><span>File</span><strong id="metricFile">—</strong></article>
+        <article><span>Sheets</span><strong id="metricSheets">0</strong></article>
+        <article><span>Fields</span><strong id="metricFields">0</strong></article>
+        <article><span>Dòng dữ liệu</span><strong id="metricRows">0</strong></article>
+      </div>
+
+      <section class="workspace-section">
+        <div class="section-heading"><div><p class="eyebrow">CẤU TRÚC WORKBOOK</p><h2>Kiểm tra các bảng và cột</h2></div><p>Sheet đang được chọn để tính sẽ có thêm ba cột định danh ngay trong card.</p></div>
+        <div id="schemaEmpty" class="empty-state"><strong>Mô hình bảng sẽ hiện ở đây</strong><span>Mỗi header trở thành một field có định danh theo sheet và tên cột.</span></div>
+        <div id="sheetList" class="sheet-list"></div>
+      </section>
+    </section>
+
+    <section id="tab-formulas" class="tab-panel" role="tabpanel" tabindex="0" hidden>
+      <div class="page-heading compact">
+        <div><p class="eyebrow">PRESET STUDIO</p><h1>Nối bảng vào công thức</h1><p>Field được nhóm theo bảng. Khối Lấy nguồn đọc một bảng; khối Tra bảng nối sang bảng khác theo khóa.</p></div>
+      </div>
+
+      <div class="formula-toolbar toolbar">
+        <label class="inline-field grow"><span>Tên preset</span><input id="presetName" value="Bộ công thức mới"></label>
+        <label class="inline-field version"><span>Phiên bản</span><input id="presetVersion" value="1.0.0"></label>
+        <div class="preset-actions" aria-label="Quản lý preset">
+          <label class="button secondary file-button">Nạp preset<input id="presetFileInput" type="file" accept=".json,application/json"></label>
+          <button id="savePreset" class="button primary" type="button" aria-describedby="savePresetReason">Lưu preset</button>
+          <span id="savePresetReason" class="control-reason" role="status"></span>
+        </div>
+      </div>
+
+      <section class="recipe-control-panel" aria-label="Công thức đang sửa">
+        <div class="recipe-switcher">
+          <span>Công thức</span>
+          <button id="recipeMenuButton" class="recipe-menu-button" type="button" aria-haspopup="listbox" aria-expanded="false"><strong id="recipeMenuLabel">Chưa có công thức</strong><i class="chevron-icon" aria-hidden="true"></i></button>
+          <div id="recipeMenu" class="recipe-menu" role="listbox" hidden></div>
+          <select id="recipeSelect" aria-label="Công thức đang sửa" hidden></select>
+        </div>
+        <button id="newRecipe" class="button secondary" type="button">+ Công thức</button>
+        <div id="recipeMeta" class="recipe-meta"></div>
+      </section>
+
+      <div id="formulaErrors" class="status-banner neutral" role="status"><span class="status-icon">○</span><div><strong>Chưa sẵn sàng</strong><p>Nạp workbook để có field.</p></div></div>
+
+      <div class="builder-grid canvas-builder">
+        <aside class="builder-column library-panel" aria-label="Thư viện khối">
+          <div class="panel-title"><span>THƯ VIỆN KHỐI</span><b id="blockCount">19</b></div>
+          <div id="blockLibrary" class="block-library"></div>
+        </aside>
+        <section id="recipePanel" class="builder-column recipe-panel canvas-panel" aria-label="Canvas công thức">
+          <div class="canvas-toolbar">
+            <span class="canvas-title"><b>SƠ ĐỒ CÔNG THỨC</b><small>Kéo khối từ thư viện · kéo chấm phải sang chấm trái · double-click để cài đặt</small></span>
+            <span id="graphStatus" class="graph-status" role="status">Chưa có graph</span>
+            <button id="autoArrange" class="canvas-tool-button" type="button">Tự xếp gọn</button>
+            <span class="zoom-controls" aria-label="Điều khiển zoom canvas">
+              <button id="zoomOut" type="button" title="Thu nhỏ">−</button>
+              <button id="zoomReset" type="button" title="Đặt lại 100%"><span id="zoomLabel">100%</span></button>
+              <button id="zoomIn" type="button" title="Phóng to">+</button>
+              <button id="zoomFit" type="button" title="Vừa toàn bộ graph">Fit</button>
+            </span>
+          </div>
+          <div id="formulaCanvas" class="formula-canvas" tabindex="0" aria-label="Canvas dựng công thức. Kéo nền để di chuyển, Ctrl và con lăn để zoom, kéo cổng tròn để nối khối.">
+            <div id="canvasWorld" class="canvas-world">
+              <svg id="connectionLayer" class="connection-layer" width="2400" height="1400" viewBox="0 0 2400 1400" aria-hidden="true"><defs><marker id="graphArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="marker-normal" d="M 0 0 L 10 5 L 0 10 z"></path></marker><marker id="ghostArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="marker-ghost" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs><g id="edgeLayer"></g><path id="ghostEdge" class="graph-edge ghost" marker-end="url(#ghostArrow)" hidden></path></svg>
+              <div id="nodeList" class="canvas-nodes"></div>
+            </div>
+            <div id="nodeEmpty" class="empty-state canvas-empty"><strong>Recipe đang trống</strong><span>Kéo một khối từ thư viện vào vùng chấm.</span></div>
+            <div class="canvas-help">Kéo nền để di chuyển · Ctrl + con lăn để phóng to · Kéo chấm phải → chấm trái để nối</div>
+          </div>
+        </section>
+      </div>
+      <dialog id="nodeSettingsDialog" class="node-settings-dialog" aria-labelledby="nodeSettingsTitle">
+        <div class="node-settings-shell">
+          <header><span><b>CÀI ĐẶT KHỐI</b><strong id="nodeSettingsTitle">Khối công thức</strong></span><button id="closeNodeSettings" type="button" aria-label="Đóng cài đặt">×</button></header>
+          <div id="inspector" class="inspector"><div class="empty-state"><strong>Chưa chọn khối</strong><span>Double-click hoặc chuột phải một khối để cấu hình.</span></div></div>
+        </div>
+      </dialog>
+      <div id="nodeContextMenu" class="node-context-menu" role="menu" aria-label="Tuỳ chọn khối" hidden>
+        <button type="button" role="menuitem" data-context-action="settings"><span class="menu-icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M4 5h7M14 5h2M4 10h2M9 10h7M4 15h8M15 15h1"/><circle cx="12.5" cy="5" r="1.5"/><circle cx="7.5" cy="10" r="1.5"/><circle cx="13.5" cy="15" r="1.5"/></svg></span><span class="menu-label">Cài đặt khối…</span></button>
+        <button type="button" role="menuitem" data-context-action="duplicate"><span class="menu-icon" aria-hidden="true"><svg viewBox="0 0 20 20"><rect x="6.5" y="6.5" width="9" height="9" rx="2"/><path d="M13.5 6.5V6A2.5 2.5 0 0 0 11 3.5H6A2.5 2.5 0 0 0 3.5 6v5A2.5 2.5 0 0 0 6 13.5h.5"/></svg></span><span class="menu-label">Nhân bản</span></button>
+        <button type="button" role="menuitem" data-context-action="focus"><span class="menu-icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M7 3.5H5.5a2 2 0 0 0-2 2V7M13 3.5h1.5a2 2 0 0 1 2 2V7M16.5 13v1.5a2 2 0 0 1-2 2H13M7 16.5H5.5a2 2 0 0 1-2-2V13"/><circle cx="10" cy="10" r="2.25"/></svg></span><span class="menu-label">Zoom vào khối</span></button>
+        <button type="button" role="menuitem" data-context-action="disconnect"><span class="menu-icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="m7.25 12.75-1.1 1.1a3 3 0 0 1-4.25-4.24l2.48-2.48a3 3 0 0 1 4.24 0M12.75 7.25l1.1-1.1a3 3 0 0 1 4.25 4.24l-2.48 2.48a3 3 0 0 1-4.24 0M7 10h6M10 3v2M10 15v2"/></svg></span><span class="menu-label">Ngắt mọi kết nối</span></button>
+        <hr>
+        <button type="button" role="menuitem" class="danger" data-context-action="delete"><span class="menu-icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M3.5 5.5h13M8 3.5h4M6 5.5l.65 10a1.5 1.5 0 0 0 1.5 1.4h3.7a1.5 1.5 0 0 0 1.5-1.4l.65-10M8.25 8.5v5.5M11.75 8.5v5.5"/></svg></span><span class="menu-label">Xoá khối</span></button>
+      </div>
+      <div id="edgeContextMenu" class="node-context-menu edge-context-menu" role="menu" aria-label="Tuỳ chọn kết nối" hidden>
+        <button type="button" role="menuitem" data-edge-action="disconnect"><span class="menu-icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="m7.25 12.75-1.1 1.1a3 3 0 0 1-4.25-4.24l2.48-2.48a3 3 0 0 1 4.24 0M12.75 7.25l1.1-1.1a3 3 0 0 1 4.25 4.24l-2.48 2.48a3 3 0 0 1-4.24 0M7 10h6"/></svg></span><span class="menu-label">Ngắt kết nối</span></button>
+      </div>
+    </section>
+    <div id="connectionCursor" class="connection-cursor" hidden><b>→</b><span>Nối</span></div>
+
+    <section id="tab-calculate" class="tab-panel" role="tabpanel" tabindex="0" hidden>
+      <div class="page-heading">
+        <div><p class="eyebrow">CALCULATION RUN</p><h1>Tính theo bảng chủ thể</h1><p>Mỗi dòng của bảng chủ thể tạo một kết quả. Preset chỉ chạy khi toàn bộ sheet và header khớp mô hình đã lưu.</p></div>
+      </div>
+
+      <section class="calculation-subject-bar" aria-label="Chọn đối tượng tính">
+        <span><b>Tính cho</b><small>Mỗi dòng của bảng này sẽ tạo một dòng kết quả.</small></span>
+        <label><select id="calculationSubject" aria-label="Bảng dùng làm đối tượng tính"></select></label>
+      </section>
+
+      <section id="runGate" class="status-banner neutral" aria-live="polite"><span class="status-icon">○</span><div><strong>Chưa sẵn sàng</strong><p>Nạp workbook và hoàn tất preset.</p></div></section>
+
+      <div class="metric-row run-metrics">
+        <article><span>Kỳ</span><strong id="metricQuarter">Q1-2026</strong></article>
+        <article><span>Dòng chủ thể</span><strong id="metricPeople">0</strong></article>
+        <article><span>Số bảng</span><strong id="metricJobs">0</strong></article>
+        <article><span>Schema</span><strong id="metricSchema">—</strong></article>
+        <article><span>Lỗi chặn</span><strong id="metricErrors">0</strong></article>
+      </div>
+      <div id="runIssues" class="issue-list" aria-live="polite"></div>
+      <div class="calculate-action"><button id="calculateButton" class="button calculate-button" type="button" disabled>▶ TÍNH INCENTIVE</button></div>
+
+      <section class="results-panel">
+        <div class="panel-title"><span>KẾT QUẢ</span><b id="resultSummary">Chưa tính</b></div>
+        <div class="table-shell"><table class="data-table result-table"><thead><tr id="resultsHead"></tr></thead><tbody id="resultsBody"></tbody></table><div id="resultsEmpty" class="empty-state"><strong>Chưa có kết quả</strong><span>Khi mô hình bảng và công thức hợp lệ, bấm Tính Incentive.</span></div></div>
+        <div class="export-bar"><span>Xuất kết quả</span><button id="exportBk" class="button secondary" type="button" disabled title="File Excel tổng hợp chi trả và thuế của tất cả chủ thể.">Tổng hợp chi trả · XLSX</button><span id="componentExportButtons" class="component-export-buttons" aria-label="Xuất theo component recipe"></span><button id="exportJobJson" class="button ghost" type="button" disabled title="Chỉ xuất danh sách từng job và metadata kỳ; dùng để đối soát hoặc tích hợp.">Dữ liệu job · JSON</button><button id="exportReportJson" class="button primary" type="button" disabled title="Xuất toàn bộ báo cáo: tổng, từng người, từng job, preset snapshot, validation và trace.">Báo cáo đầy đủ · JSON</button></div>
+      </section>
+    </section>
+
+    <section id="tab-dashboard" class="tab-panel" role="tabpanel" tabindex="0" hidden>
+      <div class="page-heading">
+        <div><p class="eyebrow">MULTI-PERIOD VIEW</p><h1>Dashboard tổng hợp</h1><p>Nạp các file Báo cáo đầy đủ · JSON đã xuất để xem Q1 → Q4 và YTD. Dashboard không lưu lịch sử hoặc gửi dữ liệu ra ngoài.</p></div>
+        <div class="dashboard-heading-action"><label class="button primary file-button">Nạp báo cáo JSON<input id="reportFiles" type="file" accept=".json,application/json" multiple></label></div>
+      </div>
+
+      <div class="metric-row dashboard-metrics">
+        <article><span>Số report</span><strong id="dashReports">0</strong></article>
+        <article><span>Tổng gross</span><strong id="dashGross">0</strong></article>
+        <article><span>Tổng thuế</span><strong id="dashTax">0</strong></article>
+        <article class="accent-metric"><span>Tổng thực nhận</span><strong id="dashNet">0</strong></article>
+      </div>
+
+      <div class="chart-grid">
+        <article class="chart-panel"><div class="panel-title"><span>THỰC NHẬN THEO QUÝ</span><b>Q1 → Q4</b></div><div class="canvas-shell"><canvas id="quarterChart" width="720" height="300"></canvas><div id="dashboardEmpty" class="empty-state"><strong>Chưa có báo cáo</strong><span>Nạp ít nhất hai file Báo cáo đầy đủ · JSON để dựng góc nhìn nhiều kỳ.</span></div></div></article>
+        <article class="chart-panel"><div class="panel-title"><span>TOP NGƯỜI YTD</span><b>NET PAY</b></div><div class="canvas-shell"><canvas id="peopleChart" width="720" height="300"></canvas></div></article>
+      </div>
+
+      <section class="dashboard-table results-panel">
+        <div class="panel-title"><span>CHI TIẾT YTD</span><b id="dashPeopleCount">0 người</b></div>
+        <div class="table-shell"><table class="data-table"><thead><tr><th>Người</th><th>Team</th><th>YTD</th><th>Theo quý</th></tr></thead><tbody id="dashboardPeople"></tbody></table><div id="dashboardTableEmpty" class="empty-state"><strong>Chưa có dữ liệu YTD</strong><span>Danh sách sẽ xuất hiện sau khi nạp report.</span></div></div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="footer"><span>Trustana Finance Workspace</span><span>Dữ liệu không rời khỏi thiết bị</span></footer>
+
+  <dialog id="traceDialog"><div class="dialog-card trace-card"><div class="dialog-head"><div><p class="eyebrow">AUDIT TRACE</p><h2 id="traceTitle">Giải thích kết quả</h2></div><button id="closeTrace" class="icon-button" type="button" aria-label="Đóng">×</button></div><div id="traceContent"></div></div></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/vendor/xlsx-js-style.bundle.js"></script>
+  <script src="js/core/schema.js"></script>
+  <script src="js/core/registry.js"></script>
+  <script src="js/core/validator.js"></script>
+  <script src="js/core/engine.js"></script>
+  <script src="js/core/history.js"></script>
+  <script src="js/adapters/storage.js"></script>
+  <script src="js/adapters/xlsx.js"></script>
+  <script src="js/ui/formula_canvas.js"></script>
+  <script src="js/branding.js"></script>
+  <script src="js/export/categories.js"></script>
+  <script src="js/export/xlsx_bk.js"></script>
+  <script src="js/export/xlsx_bke.js"></script>
+  <script src="js/export/report.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

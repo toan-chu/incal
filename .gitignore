@@ -1,0 +1,19 @@
+# Sensitive or period-specific business data
+*.xlsx
+!INPUT-Incentive-mau.xlsx
+*.xls
+docs/origin/
+reports/*.json
+outputs/
+tmp/
+
+# Local user state and exported artifacts
+v3/local-data/
+v3/exports/
+*.local.json
+
+# Codex CLI artifacts
+.codex/
+.agents/
+
+docs/INPUT-real-*.xlsx

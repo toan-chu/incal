@@ -1,0 +1,818 @@
+{
+  "schemaVersion": 3,
+  "id": "TRUSTANA-Q1",
+  "name": "Trustana Incentive Q1 (auto-tier, FIN method)",
+  "version": "1.0.0",
+  "sourceSchema": {
+    "sourceSchemaVersion": 2,
+    "fingerprint": "FNV1A-cd03bc7f-28",
+    "subjectTableId": "table:Nh%C3%A2n%20s%E1%BB%B1",
+    "sheets": [
+      {
+        "tableId": "table:Jobs",
+        "name": "Jobs",
+        "label": "Jobs",
+        "role": "Giao dịch",
+        "headerRow": 0,
+        "rowCount": 10,
+        "keyFieldId": "source:Jobs::M%C3%A3%20job",
+        "fields": [
+          {
+            "id": "source:Jobs::Th%C3%A1ng",
+            "header": "Tháng",
+            "columnIndex": 0,
+            "type": "Number"
+          },
+          {
+            "id": "source:Jobs::M%C3%A3%20job",
+            "header": "Mã job",
+            "columnIndex": 1,
+            "type": "Text"
+          },
+          {
+            "id": "source:Jobs::M%C3%A3%20NV",
+            "header": "Mã NV",
+            "columnIndex": 2,
+            "type": "Text"
+          },
+          {
+            "id": "source:Jobs::Nh%C3%A2n%20vi%C3%AAn",
+            "header": "Nhân viên",
+            "columnIndex": 3,
+            "type": "Text"
+          },
+          {
+            "id": "source:Jobs::Kh%C3%A1ch%20h%C3%A0ng",
+            "header": "Khách hàng",
+            "columnIndex": 4,
+            "type": "Text"
+          },
+          {
+            "id": "source:Jobs::Team",
+            "header": "Team",
+            "columnIndex": 5,
+            "type": "Text"
+          },
+          {
+            "id": "source:Jobs::GP",
+            "header": "GP",
+            "columnIndex": 6,
+            "type": "Money"
+          },
+          {
+            "id": "source:Jobs::Tr%E1%BA%A1ng%20th%C3%A1i%20thu",
+            "header": "Trạng thái thu",
+            "columnIndex": 7,
+            "type": "Text"
+          },
+          {
+            "id": "source:Jobs::%25%20%C4%91%C3%A3%20thu",
+            "header": "% đã thu",
+            "columnIndex": 8,
+            "type": "Percent"
+          }
+        ]
+      },
+      {
+        "tableId": "table:Nh%C3%A2n%20s%E1%BB%B1",
+        "name": "Nhân sự",
+        "label": "Nhân sự",
+        "role": "Chủ thể",
+        "headerRow": 0,
+        "rowCount": 1,
+        "keyFieldId": "source:Nh%C3%A2n%20s%E1%BB%B1::M%C3%A3%20NV",
+        "fields": [
+          {
+            "id": "source:Nh%C3%A2n%20s%E1%BB%B1::M%C3%A3%20NV",
+            "header": "Mã NV",
+            "columnIndex": 0,
+            "type": "Text"
+          },
+          {
+            "id": "source:Nh%C3%A2n%20s%E1%BB%B1::H%E1%BB%8D%20t%C3%AAn",
+            "header": "Họ tên",
+            "columnIndex": 1,
+            "type": "Text"
+          },
+          {
+            "id": "source:Nh%C3%A2n%20s%E1%BB%B1::L%C6%B0%C6%A1ng%20T1",
+            "header": "Lương T1",
+            "columnIndex": 2,
+            "type": "Money"
+          },
+          {
+            "id": "source:Nh%C3%A2n%20s%E1%BB%B1::L%C6%B0%C6%A1ng%20T2",
+            "header": "Lương T2",
+            "columnIndex": 3,
+            "type": "Money"
+          },
+          {
+            "id": "source:Nh%C3%A2n%20s%E1%BB%B1::L%C6%B0%C6%A1ng%20T3",
+            "header": "Lương T3",
+            "columnIndex": 4,
+            "type": "Money"
+          },
+          {
+            "id": "source:Nh%C3%A2n%20s%E1%BB%B1::Target%20qu%C3%BD",
+            "header": "Target quý",
+            "columnIndex": 5,
+            "type": "Money"
+          },
+          {
+            "id": "source:Nh%C3%A2n%20s%E1%BB%B1::%C4%90i%E1%BB%81u%20ch%E1%BB%89nh%20%25",
+            "header": "Điều chỉnh %",
+            "columnIndex": 6,
+            "type": "Percent"
+          },
+          {
+            "id": "source:Nh%C3%A2n%20s%E1%BB%B1::H%E1%BB%93%20s%C6%A1",
+            "header": "Hồ sơ",
+            "columnIndex": 7,
+            "type": "Text"
+          },
+          {
+            "id": "source:Nh%C3%A2n%20s%E1%BB%B1::H%C4%90L%C4%90",
+            "header": "HĐLĐ",
+            "columnIndex": 8,
+            "type": "Boolean"
+          }
+        ]
+      },
+      {
+        "tableId": "table:Kh%C3%A1ch%20h%C3%A0ng",
+        "name": "Khách hàng",
+        "label": "Khách hàng",
+        "role": "Tra cứu",
+        "headerRow": 0,
+        "rowCount": 4,
+        "keyFieldId": "source:Kh%C3%A1ch%20h%C3%A0ng::Kh%C3%A1ch%20h%C3%A0ng",
+        "fields": [
+          {
+            "id": "source:Kh%C3%A1ch%20h%C3%A0ng::Kh%C3%A1ch%20h%C3%A0ng",
+            "header": "Khách hàng",
+            "columnIndex": 0,
+            "type": "Text"
+          },
+          {
+            "id": "source:Kh%C3%A1ch%20h%C3%A0ng::M%E1%BB%A9c",
+            "header": "Mức",
+            "columnIndex": 1,
+            "type": "Text"
+          }
+        ]
+      },
+      {
+        "tableId": "table:C%C3%B4ng%20n%E1%BB%A3%20chi%20ti%E1%BA%BFt",
+        "name": "Công nợ chi tiết",
+        "label": "Công nợ chi tiết",
+        "role": "Tra cứu",
+        "headerRow": 0,
+        "rowCount": 2,
+        "keyFieldId": "source:C%C3%B4ng%20n%E1%BB%A3%20chi%20ti%E1%BA%BFt::Job",
+        "fields": [
+          {
+            "id": "source:C%C3%B4ng%20n%E1%BB%A3%20chi%20ti%E1%BA%BFt::M%C3%A3%20NV",
+            "header": "Mã NV",
+            "columnIndex": 0,
+            "type": "Text"
+          },
+          {
+            "id": "source:C%C3%B4ng%20n%E1%BB%A3%20chi%20ti%E1%BA%BFt::Job",
+            "header": "Job",
+            "columnIndex": 1,
+            "type": "Text"
+          },
+          {
+            "id": "source:C%C3%B4ng%20n%E1%BB%A3%20chi%20ti%E1%BA%BFt::Doanh%20thu%20sau%20thu%E1%BA%BF",
+            "header": "Doanh thu sau thuế",
+            "columnIndex": 2,
+            "type": "Money"
+          },
+          {
+            "id": "source:C%C3%B4ng%20n%E1%BB%A3%20chi%20ti%E1%BA%BFt::S%E1%BB%91%20th%C3%A1ng%20qu%C3%A1%20h%E1%BA%A1n",
+            "header": "Số tháng quá hạn",
+            "columnIndex": 3,
+            "type": "Number"
+          }
+        ]
+      }
+    ],
+    "relations": [
+      {
+        "id": "com:ml",
+        "recipeId": "com",
+        "nodeId": "ml",
+        "targetTableId": "table:Kh%C3%A1ch%20h%C3%A0ng",
+        "lookupFieldId": "source:Kh%C3%A1ch%20h%C3%A0ng::Kh%C3%A1ch%20h%C3%A0ng",
+        "returnFieldId": "source:Kh%C3%A1ch%20h%C3%A0ng::M%E1%BB%A9c",
+        "source": {
+          "kind": "node",
+          "nodeId": "src"
+        },
+        "sourceKeyFieldId": "source:Jobs::Kh%C3%A1ch%20h%C3%A0ng",
+        "derivedFieldId": "derived.muc",
+        "derivedFieldLabel": "Mức"
+      },
+      {
+        "id": "tax:ml",
+        "recipeId": "tax",
+        "nodeId": "ml",
+        "targetTableId": "table:Kh%C3%A1ch%20h%C3%A0ng",
+        "lookupFieldId": "source:Kh%C3%A1ch%20h%C3%A0ng::Kh%C3%A1ch%20h%C3%A0ng",
+        "returnFieldId": "source:Kh%C3%A1ch%20h%C3%A0ng::M%E1%BB%A9c",
+        "source": {
+          "kind": "node",
+          "nodeId": "src"
+        },
+        "sourceKeyFieldId": "source:Jobs::Kh%C3%A1ch%20h%C3%A0ng",
+        "derivedFieldId": "derived.muc",
+        "derivedFieldLabel": "Mức"
+      }
+    ],
+    "issues": []
+  },
+  "bindings": {
+    "subject.id": "source:Nh%C3%A2n%20s%E1%BB%B1::M%C3%A3%20NV",
+    "subject.name": "source:Nh%C3%A2n%20s%E1%BB%B1::H%E1%BB%8D%20t%C3%AAn",
+    "subject.group": "source:Nh%C3%A2n%20s%E1%BB%B1::H%E1%BB%93%20s%C6%A1"
+  },
+  "fieldLabels": {},
+  "recipes": [
+    {
+      "id": "com",
+      "name": "COM Waterfall",
+      "component": "com",
+      "enabled": true,
+      "scope": "person",
+      "nodes": [
+        {
+          "id": "src",
+          "blockId": "source",
+          "inputs": {},
+          "config": {
+            "table": "table:Jobs",
+            "ownerFieldId": "source:Jobs::M%C3%A3%20NV"
+          }
+        },
+        {
+          "id": "ml",
+          "blockId": "map_lookup",
+          "inputs": {
+            "table": {
+              "kind": "node",
+              "nodeId": "src"
+            }
+          },
+          "config": {
+            "sourceKeyFieldId": "source:Jobs::Kh%C3%A1ch%20h%C3%A0ng",
+            "table": "table:Kh%C3%A1ch%20h%C3%A0ng",
+            "lookupFieldId": "source:Kh%C3%A1ch%20h%C3%A0ng::Kh%C3%A1ch%20h%C3%A0ng",
+            "returnFieldId": "source:Kh%C3%A1ch%20h%C3%A0ng::M%E1%BB%A9c",
+            "returnType": "Text",
+            "derivedFieldId": "derived.muc",
+            "derivedFieldLabel": "Mức",
+            "fallback": ""
+          }
+        },
+        {
+          "id": "tm",
+          "blockId": "filter",
+          "inputs": {
+            "table": {
+              "kind": "node",
+              "nodeId": "ml"
+            }
+          },
+          "config": {
+            "fieldId": "source:Jobs::Team",
+            "operator": "eq",
+            "value": "COM"
+          }
+        },
+        {
+          "id": "pd",
+          "blockId": "filter",
+          "inputs": {
+            "table": {
+              "kind": "node",
+              "nodeId": "tm"
+            }
+          },
+          "config": {
+            "fieldId": "source:Jobs::Tr%E1%BA%A1ng%20th%C3%A1i%20thu",
+            "operator": "eq",
+            "value": "Paid"
+          }
+        },
+        {
+          "id": "f1",
+          "blockId": "filter",
+          "inputs": {
+            "table": {
+              "kind": "node",
+              "nodeId": "pd"
+            }
+          },
+          "config": {
+            "fieldId": "derived.muc",
+            "operator": "eq",
+            "value": "Mức 1"
+          }
+        },
+        {
+          "id": "s1",
+          "blockId": "scan_sum",
+          "inputs": {
+            "table": {
+              "kind": "node",
+              "nodeId": "f1"
+            }
+          },
+          "config": {
+            "fieldId": "source:Jobs::GP"
+          }
+        },
+        {
+          "id": "f2",
+          "blockId": "filter",
+          "inputs": {
+            "table": {
+              "kind": "node",
+              "nodeId": "pd"
+            }
+          },
+          "config": {
+            "fieldId": "derived.muc",
+            "operator": "eq",
+            "value": "Mức 2"
+          }
+        },
+        {
+          "id": "s2",
+          "blockId": "scan_sum",
+          "inputs": {
+            "table": {
+              "kind": "node",
+              "nodeId": "f2"
+            }
+          },
+          "config": {
+            "fieldId": "source:Jobs::GP"
+          }
+        },
+        {
+          "id": "f3",
+          "blockId": "filter",
+          "inputs": {
+            "table": {
+              "kind": "node",
+              "nodeId": "pd"
+            }
+          },
+          "config": {
+            "fieldId": "derived.muc",
+            "operator": "eq",
+            "value": "Mức 3"
+          }
+        },
+        {
+          "id": "s3",
+          "blockId": "scan_sum",
+          "inputs": {
+            "table": {
+              "kind": "node",
+              "nodeId": "f3"
+            }
+          },
+          "config": {
+            "fieldId": "source:Jobs::GP"
+          }
+        },
+        {
+          "id": "wf",
+          "blockId": "macro.waterfall",
+          "inputs": {
+            "gpLevel1": {
+              "kind": "node",
+              "nodeId": "s1"
+            },
+            "gpLevel2": {
+              "kind": "node",
+              "nodeId": "s2"
+            },
+            "gpLevel3": {
+              "kind": "node",
+              "nodeId": "s3"
+            },
+            "target": {
+              "kind": "field",
+              "fieldId": "source:Nh%C3%A2n%20s%E1%BB%B1::Target%20qu%C3%BD"
+            },
+            "adjustment": {
+              "kind": "field",
+              "fieldId": "source:Nh%C3%A2n%20s%E1%BB%B1::%C4%90i%E1%BB%81u%20ch%E1%BB%89nh%20%25"
+            }
+          },
+          "config": {
+            "rates": [
+              0.08,
+              0.12,
+              0.17
+            ]
+          }
+        }
+      ],
+      "output": {
+        "nodeId": "wf",
+        "type": "Money"
+      }
+    },
+    {
+      "id": "pen",
+      "name": "Phạt",
+      "component": "penalty",
+      "enabled": true,
+      "scope": "person",
+      "nodes": [
+        {
+          "id": "psrc",
+          "blockId": "source",
+          "inputs": {},
+          "config": {
+            "table": "table:C%C3%B4ng%20n%E1%BB%A3%20chi%20ti%E1%BA%BFt",
+            "ownerFieldId": "source:C%C3%B4ng%20n%E1%BB%A3%20chi%20ti%E1%BA%BFt::M%C3%A3%20NV"
+          }
+        },
+        {
+          "id": "pbase",
+          "blockId": "map_arithmetic",
+          "inputs": {
+            "table": {
+              "kind": "node",
+              "nodeId": "psrc"
+            }
+          },
+          "config": {
+            "leftMode": "field",
+            "leftFieldId": "source:C%C3%B4ng%20n%E1%BB%A3%20chi%20ti%E1%BA%BFt::Doanh%20thu%20sau%20thu%E1%BA%BF",
+            "leftLiteral": 0,
+            "leftLiteralType": "Number",
+            "operator": "*",
+            "rightMode": "field",
+            "rightFieldId": "source:C%C3%B4ng%20n%E1%BB%A3%20chi%20ti%E1%BA%BFt::S%E1%BB%91%20th%C3%A1ng%20qu%C3%A1%20h%E1%BA%A1n",
+            "rightLiteral": 0,
+            "rightLiteralType": "Number",
+            "derivedFieldId": "derived.penalty_base",
+            "derivedFieldLabel": "Doanh thu × tháng"
+          }
+        },
+        {
+          "id": "pline",
+          "blockId": "map_arithmetic",
+          "inputs": {
+            "table": {
+              "kind": "node",
+              "nodeId": "pbase"
+            }
+          },
+          "config": {
+            "leftMode": "field",
+            "leftFieldId": "derived.penalty_base",
+            "leftLiteral": 0,
+            "leftLiteralType": "Number",
+            "operator": "*",
+            "rightMode": "literal",
+            "rightFieldId": "",
+            "rightLiteral": 0.01,
+            "rightLiteralType": "Percent",
+            "derivedFieldId": "derived.penalty_line",
+            "derivedFieldLabel": "Phạt dòng tự tính"
+          }
+        },
+        {
+          "id": "psum",
+          "blockId": "scan_sum",
+          "inputs": {
+            "table": {
+              "kind": "node",
+              "nodeId": "pline"
+            }
+          },
+          "config": {
+            "fieldId": "derived.penalty_line"
+          }
+        }
+      ],
+      "output": {
+        "nodeId": "psum",
+        "type": "Money"
+      }
+    },
+    {
+      "id": "tax",
+      "name": "Thuế TNCN",
+      "component": "tax",
+      "enabled": true,
+      "scope": "person",
+      "nodes": [
+        {
+          "id": "src",
+          "blockId": "source",
+          "inputs": {},
+          "config": {
+            "table": "table:Jobs",
+            "ownerFieldId": "source:Jobs::M%C3%A3%20NV"
+          }
+        },
+        {
+          "id": "ml",
+          "blockId": "map_lookup",
+          "inputs": {
+            "table": {
+              "kind": "node",
+              "nodeId": "src"
+            }
+          },
+          "config": {
+            "sourceKeyFieldId": "source:Jobs::Kh%C3%A1ch%20h%C3%A0ng",
+            "table": "table:Kh%C3%A1ch%20h%C3%A0ng",
+            "lookupFieldId": "source:Kh%C3%A1ch%20h%C3%A0ng::Kh%C3%A1ch%20h%C3%A0ng",
+            "returnFieldId": "source:Kh%C3%A1ch%20h%C3%A0ng::M%E1%BB%A9c",
+            "returnType": "Text",
+            "derivedFieldId": "derived.muc",
+            "derivedFieldLabel": "Mức",
+            "fallback": ""
+          }
+        },
+        {
+          "id": "tm",
+          "blockId": "filter",
+          "inputs": {
+            "table": {
+              "kind": "node",
+              "nodeId": "ml"
+            }
+          },
+          "config": {
+            "fieldId": "source:Jobs::Team",
+            "operator": "eq",
+            "value": "COM"
+          }
+        },
+        {
+          "id": "pd",
+          "blockId": "filter",
+          "inputs": {
+            "table": {
+              "kind": "node",
+              "nodeId": "tm"
+            }
+          },
+          "config": {
+            "fieldId": "source:Jobs::Tr%E1%BA%A1ng%20th%C3%A1i%20thu",
+            "operator": "eq",
+            "value": "Paid"
+          }
+        },
+        {
+          "id": "f1",
+          "blockId": "filter",
+          "inputs": {
+            "table": {
+              "kind": "node",
+              "nodeId": "pd"
+            }
+          },
+          "config": {
+            "fieldId": "derived.muc",
+            "operator": "eq",
+            "value": "Mức 1"
+          }
+        },
+        {
+          "id": "s1",
+          "blockId": "scan_sum",
+          "inputs": {
+            "table": {
+              "kind": "node",
+              "nodeId": "f1"
+            }
+          },
+          "config": {
+            "fieldId": "source:Jobs::GP"
+          }
+        },
+        {
+          "id": "f2",
+          "blockId": "filter",
+          "inputs": {
+            "table": {
+              "kind": "node",
+              "nodeId": "pd"
+            }
+          },
+          "config": {
+            "fieldId": "derived.muc",
+            "operator": "eq",
+            "value": "Mức 2"
+          }
+        },
+        {
+          "id": "s2",
+          "blockId": "scan_sum",
+          "inputs": {
+            "table": {
+              "kind": "node",
+              "nodeId": "f2"
+            }
+          },
+          "config": {
+            "fieldId": "source:Jobs::GP"
+          }
+        },
+        {
+          "id": "f3",
+          "blockId": "filter",
+          "inputs": {
+            "table": {
+              "kind": "node",
+              "nodeId": "pd"
+            }
+          },
+          "config": {
+            "fieldId": "derived.muc",
+            "operator": "eq",
+            "value": "Mức 3"
+          }
+        },
+        {
+          "id": "s3",
+          "blockId": "scan_sum",
+          "inputs": {
+            "table": {
+              "kind": "node",
+              "nodeId": "f3"
+            }
+          },
+          "config": {
+            "fieldId": "source:Jobs::GP"
+          }
+        },
+        {
+          "id": "wf",
+          "blockId": "macro.waterfall",
+          "inputs": {
+            "gpLevel1": {
+              "kind": "node",
+              "nodeId": "s1"
+            },
+            "gpLevel2": {
+              "kind": "node",
+              "nodeId": "s2"
+            },
+            "gpLevel3": {
+              "kind": "node",
+              "nodeId": "s3"
+            },
+            "target": {
+              "kind": "field",
+              "fieldId": "source:Nh%C3%A2n%20s%E1%BB%B1::Target%20qu%C3%BD"
+            },
+            "adjustment": {
+              "kind": "field",
+              "fieldId": "source:Nh%C3%A2n%20s%E1%BB%B1::%C4%90i%E1%BB%81u%20ch%E1%BB%89nh%20%25"
+            }
+          },
+          "config": {
+            "rates": [
+              0.08,
+              0.12,
+              0.17
+            ]
+          }
+        },
+        {
+          "id": "psrc",
+          "blockId": "source",
+          "inputs": {},
+          "config": {
+            "table": "table:C%C3%B4ng%20n%E1%BB%A3%20chi%20ti%E1%BA%BFt",
+            "ownerFieldId": "source:C%C3%B4ng%20n%E1%BB%A3%20chi%20ti%E1%BA%BFt::M%C3%A3%20NV"
+          }
+        },
+        {
+          "id": "pbase",
+          "blockId": "map_arithmetic",
+          "inputs": {
+            "table": {
+              "kind": "node",
+              "nodeId": "psrc"
+            }
+          },
+          "config": {
+            "leftMode": "field",
+            "leftFieldId": "source:C%C3%B4ng%20n%E1%BB%A3%20chi%20ti%E1%BA%BFt::Doanh%20thu%20sau%20thu%E1%BA%BF",
+            "leftLiteral": 0,
+            "leftLiteralType": "Number",
+            "operator": "*",
+            "rightMode": "field",
+            "rightFieldId": "source:C%C3%B4ng%20n%E1%BB%A3%20chi%20ti%E1%BA%BFt::S%E1%BB%91%20th%C3%A1ng%20qu%C3%A1%20h%E1%BA%A1n",
+            "rightLiteral": 0,
+            "rightLiteralType": "Number",
+            "derivedFieldId": "derived.penalty_base",
+            "derivedFieldLabel": "Doanh thu × tháng"
+          }
+        },
+        {
+          "id": "pline",
+          "blockId": "map_arithmetic",
+          "inputs": {
+            "table": {
+              "kind": "node",
+              "nodeId": "pbase"
+            }
+          },
+          "config": {
+            "leftMode": "field",
+            "leftFieldId": "derived.penalty_base",
+            "leftLiteral": 0,
+            "leftLiteralType": "Number",
+            "operator": "*",
+            "rightMode": "literal",
+            "rightFieldId": "",
+            "rightLiteral": 0.01,
+            "rightLiteralType": "Percent",
+            "derivedFieldId": "derived.penalty_line",
+            "derivedFieldLabel": "Phạt dòng tự tính"
+          }
+        },
+        {
+          "id": "psum",
+          "blockId": "scan_sum",
+          "inputs": {
+            "table": {
+              "kind": "node",
+              "nodeId": "pline"
+            }
+          },
+          "config": {
+            "fieldId": "derived.penalty_line"
+          }
+        },
+        {
+          "id": "base",
+          "blockId": "arithmetic",
+          "inputs": {
+            "left": {
+              "kind": "node",
+              "nodeId": "wf"
+            },
+            "right": {
+              "kind": "node",
+              "nodeId": "psum"
+            }
+          },
+          "config": {
+            "operator": "-"
+          }
+        },
+        {
+          "id": "tx",
+          "blockId": "macro.tax_dual",
+          "inputs": {
+            "taxableIncome": {
+              "kind": "node",
+              "nodeId": "base"
+            },
+            "hasLaborContract": {
+              "kind": "literal",
+              "type": "Boolean",
+              "value": false
+            }
+          },
+          "config": {
+            "rates": [
+              0.05,
+              0.1,
+              0.2,
+              0.3,
+              0.35
+            ],
+            "quickDeductions": [
+              0,
+              500000,
+              3500000,
+              9500000,
+              14500000
+            ],
+            "flatRate": 0.1
+          }
+        }
+      ],
+      "output": {
+        "nodeId": "tx",
+        "type": "Money"
+      }
+    }
+  ]
+}
