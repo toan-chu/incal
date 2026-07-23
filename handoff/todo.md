@@ -1,5 +1,45 @@
 # Todo
 
+## [2026-07-22 17:22] -- Directive: Thêm toán tử "thuộc danh sách" cho khối Lọc (multi-value)
+
+Codex đọc `handoff/audit.md` (REVIEW gần nhất). Việc nhỏ, không nộp plan riêng cũng được — nhưng KHÔNG đụng engine rounding/macro.
+
+1. **Goal + business context:** FIN cần lọc 1 cột theo **nhiều giá trị** trong MỘT khối (VD Team ∈ {General, New} đều là COM). Hiện khối "Lọc điều kiện" chỉ có toán tử "bằng" (1 giá trị) → COM thiếu các job "New", số bị hụt vài triệu. Cần toán tử **"thuộc danh sách"** để FIN dựng COM đúng, không phải union 2 filter (chưa có).
+
+2. **Rough technical direction:** Thêm toán tử **"thuộc danh sách"** (in) vào khối `filter`; ô Giá trị nhập **nhiều mục ngăn cách bằng dấu phẩy hoặc chấm phẩy**; khớp nếu ô = **bất kỳ mục nào** (dùng chuẩn hoá bỏ dấu + lowercase như so khớp hiện tại). Tùy chọn: thêm "không thuộc danh sách" nếu dễ. Hiển thị nhãn tiếng Việt.
+
+3. **Out of scope:**
+   - KHÔNG sửa 14 khối khác + 3 macro + chính sách làm-tròn (baseline engine); chỉ **thêm 1 toán tử** vào `filter`.
+   - KHÔNG đổi logic tính; số cũ không hồi quy.
+   - KHÔNG commit data thật.
+
+4. **Acceptance criteria:**
+   - Khối "Lọc điều kiện" có thêm toán tử **"thuộc danh sách"** (nhãn tiếng Việt); giá trị lưu vẫn là code (`in`).
+   - Lọc `Team` "thuộc danh sách" `General, New` → giữ đúng các dòng có Team = General HOẶC New (test đếm đúng số dòng); khớp không phân biệt hoa/thường/dấu.
+   - `node --test` pass (thêm test cho toán tử mới); nạp `presets/trustana-q1.json` + sample → số cũ **không hồi quy**.
+   - REPORT + output verify dán vào `handoff/audit.md`.
+
+   *Decision delegated to Codex (CTO):* cú pháp nhập danh sách (phẩy/chấm phẩy/xuống dòng), nhãn hiển thị, có làm "không thuộc danh sách" hay không.
+
+### Technical execution checklist -- Codex CTO
+
+- [x] Thêm duy nhất code `in` vào option schema của `filter`; tách danh sách bằng phẩy, chấm phẩy hoặc xuống dòng, chuẩn hoá từng mục bằng matcher hiện hữu.
+- [x] Hiển thị nhãn `thuộc danh sách` và gợi ý nhập `General, New`; không thêm toán tử phủ định.
+- [x] Thêm unit/browser regression cho count, hoa-thường, bỏ dấu và giá trị code `in`.
+- [x] Chạy targeted/full Node + Chrome QA và guardrail Q1; xác minh hash engine không đổi, ghi REPORT/history.
+
+## Test Plan -- Filter `in`
+
+| # | Scenario | Expected | Status |
+|---|----------|----------|--------|
+| 1 | `Team in "General, New"` | Giữ cả dòng General và New | pass |
+| 2 | Danh sách trộn phẩy/chấm phẩy/xuống dòng, hoa-thường và bỏ dấu | Chuẩn hoá từng mục, bỏ mục rỗng, đếm đúng | pass |
+| 3 | UI Formula | Nhãn tiếng Việt, value preset vẫn `in`, ô Giá trị có gợi ý nhiều mục | pass |
+| 4 | Q1 sample + preset | Phạt 2.676.672; NET 12.516.386; lệch 0 | pass |
+| 5 | Full regression | `node --test` và desktop QA pass; engine hash không đổi | pass |
+
+---
+
 ## [2026-07-22 15:41] -- Directive: Khối map-arithmetic + phạt auto + sample ra root + README + dọn sạch (chuẩn bị giao FIN)
 
 Codex đọc `handoff/audit.md` (REVIEW gần nhất). Việc lớn có thêm primitive → **nộp technical plan vào `handoff/audit.md` trước khi code.** Chairman ủy quyền tự chạy tới 100%.

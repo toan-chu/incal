@@ -319,8 +319,12 @@ async function main() {
       { value: 'gte', label: 'lớn hơn hoặc bằng' },
       { value: 'lt', label: 'nhỏ hơn' },
       { value: 'lte', label: 'nhỏ hơn hoặc bằng' },
-      { value: 'contains', label: 'chứa' }
+      { value: 'contains', label: 'chứa' },
+      { value: 'in', label: 'thuộc danh sách' }
     ]);
+    await page.locator('#inspector select[data-config="operator"]').selectOption('in');
+    assert.equal(await page.locator('#inspector input[data-config="value"]').getAttribute('placeholder'), 'General, New', 'list operator explains multi-value input');
+    await page.locator('#inspector select[data-config="operator"]').selectOption('eq');
     await page.locator('#closeNodeSettings').click();
     assert.doesNotMatch(await page.locator('#tab-formulas').textContent(), /source:[^\s]+|%C3|%E1/);
 

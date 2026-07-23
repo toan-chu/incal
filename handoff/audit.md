@@ -1369,3 +1369,59 @@ Post-cleanup checks: all four targets absent; `tmp/` is not recreated by QA; `do
 **Toàn tuyến giờ AUTO từ dữ liệu thô:** tier (map-lookup) · phạt (map-arithmetic + quét-tổng) · incentive (waterfall/BO/KAE) · thuế — khớp FIN tuyệt đối.
 
 **Còn lại:** git (GitHub Desktop — workspace không có `.git` nên Chairman tự commit) → giao FIN.
+
+---
+
+## [2026-07-23 09:24] -- Filter `thuộc danh sách` (`in`) -- REPORT
+
+**Done:** Thêm duy nhất operator code `in` vào schema của block `filter`. Matcher tách ô Giá trị theo dấu phẩy, chấm phẩy hoặc xuống dòng, trim/bỏ mục rỗng và dùng nguyên hàm `normalized()` hiện hữu cho từng mục nên không phân biệt hoa-thường/dấu. UI hiển thị `thuộc danh sách`, preset vẫn lưu `operator: "in"`; khi chọn operator này ô Giá trị gợi ý `General, New` và giải thích ba loại dấu phân cách. Không thêm toán tử phủ định.
+
+**Files changed:** `js/core/registry.js`, `js/app.js`, `test/v3_core.test.js`, `test/v3_acceptance.test.js`, `scripts/app_browser_runner.js`, `handoff/todo.md`, `handoff/audit.md`, `log/history.md`.
+
+**Verification:**
+
+```text
+Baseline reproduction before fix:
+=> INVALID_RECIPE / BAD_CONFIG: Lọc điều kiện: giá trị "in" không hợp lệ cho Điều kiện.
+
+node --check js/core/registry.js js/app.js scripts/app_browser_runner.js
+=> all exit 0
+
+node --test test/v3_core.test.js
+=> tests 16; pass 16; fail 0
+=> filter in matches comma, semicolon, newline after case/accent normalization
+=> matched ids J1/J2/J3 for General/new/Mới; excluded Khác
+
+npm.cmd test
+=> tests 41; pass 41; fail 0
+
+node --test
+=> tests 43; pass 43; fail 0
+
+npm.cmd run qa
+=> status pass; file://
+=> UI option { value:"in", label:"thuộc danh sách" }
+=> placeholder "General, New" verified in real settings dialog
+=> Chrome 1440x900 + 1280x800
+=> consoleErrors 0; pageErrors 0; failedRequests 0; horizontalOverflow 0
+
+Official sample + presets/trustana-q1.json:
+=> filterOperators [eq,neq,gt,gte,lt,lte,contains,in]
+=> validation true
+=> penalty 2676672
+=> net 12516386
+=> delta 0
+
+SHA-256:
+=> engine.js B60CC43D997560CB74746ED0FA79B98705EFF3907225DBF982261CF0068AE090 (unchanged)
+=> registry.js EAB15CF0CC1E2BB957B82DF1E9206B177F851DCBD4DFF78D1894E716601E47E9
+=> trustana-q1.json B1E4D363A9DA5130D57835F0767D6B9695232D64E15A3D8C6907691CF18CC1DC (unchanged)
+```
+
+Visual QA inspected `formula-settings-dialog-1440x900.png` and `formulas-1280x800.png`: dialog/canvas remain framed with no clipping or overlap. Mobile was not run because the Formula canvas is explicitly desktop-only; both supported desktop widths passed.
+
+**Open questions for Cowork:** Không.
+
+**Risks/known gaps:** Empty list intentionally matches nothing. Separator characters inside a literal list item are not supported, consistent with the delegated plain-text syntax. No engine, rounding, other block executor, macro or preset logic changed.
+
+---

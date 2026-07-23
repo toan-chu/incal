@@ -232,3 +232,12 @@
 **Decision:** Keep row arithmetic additive in the registry and share one type-algebra helper across validator/UI; do not alter the engine or rounding policy. Represent a three-factor formula as two ordinary map nodes, keep derived values runtime-only, and make the anonymized root workbook the only Excel exception to the repository ignore policy.
 
 ---
+
+## [2026-07-23 09:24] -- Add multi-value filter operator
+
+**Type:** feature
+**Files Changed:** `js/core/registry.js`, `js/app.js`, `test/v3_core.test.js`, `test/v3_acceptance.test.js`, `scripts/app_browser_runner.js`, `handoff/todo.md`, `handoff/audit.md`, `log/history.md`
+**Summary:** Added operator code `in` to the existing filter block so Finance can match any value from a comma, semicolon, or newline-separated list. Each item reuses the established accent-insensitive, case-insensitive normalization; the UI displays `thuộc danh sách` and provides a multi-value input hint. Full Node tests pass 43/43, desktop browser QA has zero errors/overflow, and the official Q1 NET remains 12,516,386 with zero variance.
+**Decision:** Keep the feature as one additive filter operator rather than introducing a union block or a negative-list variant. Preserve preset/operator storage as the stable code `in` and leave the engine, rounding, other block executors and macros unchanged.
+
+---

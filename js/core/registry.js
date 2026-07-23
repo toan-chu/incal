@@ -7,7 +7,7 @@
   const T = schema.TYPES;
   const definitions = [
     block('source', 'Lấy nguồn', 'Nguồn', [], T.TABLE, [cfg('table', 'Bảng', 'select', ['jobs', 'roster']), cfg('ownerFieldId', 'Khoá người (tuỳ chọn)', 'field')], executeSource),
-    block('filter', 'Lọc điều kiện', 'Dữ liệu', [port('table', T.TABLE)], T.TABLE, [cfg('fieldId', 'Cột', 'field'), cfg('operator', 'Điều kiện', 'select', ['eq', 'neq', 'gt', 'gte', 'lt', 'lte', 'contains']), cfg('value', 'Giá trị', 'text')], executeFilter),
+    block('filter', 'Lọc điều kiện', 'Dữ liệu', [port('table', T.TABLE)], T.TABLE, [cfg('fieldId', 'Cột', 'field'), cfg('operator', 'Điều kiện', 'select', ['eq', 'neq', 'gt', 'gte', 'lt', 'lte', 'contains', 'in']), cfg('value', 'Giá trị', 'text')], executeFilter),
     block('scan_sum', 'Quét + Tổng', 'Dữ liệu', [port('table', T.TABLE)], T.MONEY, [cfg('fieldId', 'Cột tiền', 'field')], executeSum),
     block('lookup', 'Tra bảng + fallback', 'Dữ liệu', [port('key', T.ANY)], function (node) { return node.config?.returnType || T.ANY; }, [cfg('table', 'Bảng tra', 'select', ['jobs', 'roster']), cfg('lookupFieldId', 'Cột khoá', 'field'), cfg('returnFieldId', 'Cột trả về', 'field'), cfg('returnType', 'Kiểu trả về', 'select', Object.values(T)), cfg('fallback', 'Fallback', 'text')], executeLookup),
     block('map_lookup', 'Gắn cột tra cứu', 'Dữ liệu', [port('table', T.TABLE)], T.TABLE, [cfg('sourceKeyFieldId', 'Cột khoá nguồn', 'field'), cfg('table', 'Bảng tra', 'select', ['jobs', 'roster']), cfg('lookupFieldId', 'Cột khoá bảng tra', 'field'), cfg('returnFieldId', 'Cột trả về', 'field'), cfg('returnType', 'Kiểu cột mới', 'select', Object.values(T)), cfg('derivedFieldId', 'Mã cột mới', 'internal'), cfg('derivedFieldLabel', 'Tên cột mới', 'text'), cfg('fallback', 'Nếu không tìm thấy', 'text')], executeMapLookup),
@@ -245,6 +245,7 @@
   function read(row, fieldId) { return row?.[fieldId] ?? row?.[String(fieldId || '').split('.').pop()]; }
   function compare(left, right, operator) {
     if (operator === 'contains') return normalized(left).includes(normalized(right));
+    if (operator === 'in') return String(right ?? '').split(/[,;\r\n]+/).map(normalized).filter(Boolean).includes(normalized(left));
     if (operator === 'eq') return normalized(left) === normalized(right);
     if (operator === 'neq') return normalized(left) !== normalized(right);
     const a = number(left); const b = number(right);

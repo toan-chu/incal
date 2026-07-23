@@ -35,6 +35,7 @@
     lt: 'nhỏ hơn',
     lte: 'nhỏ hơn hoặc bằng',
     contains: 'chứa',
+    in: 'thuộc danh sách',
     startsWith: 'bắt đầu bằng',
     AND: 'và',
     OR: 'hoặc',
@@ -940,7 +941,12 @@
       const arithmeticField = node.blockId === 'map_arithmetic' && ['leftFieldId', 'rightFieldId'].includes(spec.id);
       control = `<select data-config="${spec.id}"><option value="">-- không dùng --</option>${sourceOptionGroups(value, arithmeticField ? inputTableId(node) : tableId, arithmeticField ? ['Money', 'Number', 'Percent'] : null, arithmeticField)}</select>`;
     }
-    else control = `<input data-config="${spec.id}" data-kind="${spec.kind}" type="${spec.kind === 'number' || (node.blockId === 'map_arithmetic' && ['leftLiteral', 'rightLiteral'].includes(spec.id)) ? 'number' : 'text'}" step="any" value="${escapeHtml(Array.isArray(value) ? value.join(', ') : value ?? '')}">`;
+    else {
+      const listHint = node.blockId === 'filter' && spec.id === 'value' && node.config?.operator === 'in'
+        ? ' placeholder="General, New" title="Nhập nhiều mục, ngăn cách bằng dấu phẩy, chấm phẩy hoặc xuống dòng"'
+        : '';
+      control = `<input data-config="${spec.id}" data-kind="${spec.kind}" type="${spec.kind === 'number' || (node.blockId === 'map_arithmetic' && ['leftLiteral', 'rightLiteral'].includes(spec.id)) ? 'number' : 'text'}" step="any" value="${escapeHtml(Array.isArray(value) ? value.join(', ') : value ?? '')}"${listHint}>`;
+    }
     return `<label class="inspector-field">${escapeHtml(spec.label)}${control}</label>`;
   }
 
@@ -982,6 +988,7 @@
     if (event.target.dataset.literalPort) updateLiteral(event.target, node);
     else applyInspectorValue(event.target, node);
     if (node.blockId === 'map_arithmetic' && ['leftMode', 'rightMode'].includes(event.target.dataset.config)) renderInspector();
+    if (node.blockId === 'filter' && event.target.dataset.config === 'operator') renderInspector();
     if (event.target.dataset.config === 'table') {
       if (node.blockId === 'source') node.config.ownerFieldId = suggestJoinField(node.config.table) || '';
       if (['lookup', 'map_lookup'].includes(node.blockId)) {

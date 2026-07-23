@@ -37,6 +37,29 @@ test('v3 registry remains exactly 16 primitive blocks and 3 locked macros', () =
   assert.equal(blocks.filter((block) => block.lockedMacro).length, 3);
 });
 
+test('filter in matches any comma, semicolon or newline item after case and accent normalization', () => {
+  const fields = [{ id: 'job.team', label: 'Team', type: 'Text', table: 'jobs' }];
+  const recipe = schema.createRecipe({
+    id: 'team-in-list',
+    nodes: [
+      { id: 'src', blockId: 'source', inputs: {}, config: { table: 'jobs', ownerFieldId: '' } },
+      { id: 'teams', blockId: 'filter', inputs: { table: { kind: 'node', nodeId: 'src' } }, config: {
+        fieldId: 'job.team', operator: 'in', value: ' general, NEW ;\n Moi ; '
+      } }
+    ],
+    output: { nodeId: 'teams', type: 'Table' }
+  });
+  const rows = [
+    { id: 'J1', 'job.team': 'General' },
+    { id: 'J2', 'job.team': 'new' },
+    { id: 'J3', 'job.team': 'Mới' },
+    { id: 'J4', 'job.team': 'Khác' }
+  ];
+  const output = engine.executeRecipe(recipe, { fields, tables: { jobs: rows } });
+  assert.deepEqual(output.value.map((row) => row.id), ['J1', 'J2', 'J3']);
+  assert.deepEqual(rows.map((row) => row['job.team']), ['General', 'new', 'Mới', 'Khác']);
+});
+
 test('map lookup attaches a derived field that downstream filter and sum can type-check', () => {
   const fields = [
     { id: 'jobs.customer', label: 'Khách hàng', type: 'Text', table: 'jobs' },

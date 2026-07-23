@@ -121,6 +121,7 @@ test('Formula tab exposes human-readable labels while preserving internal node a
   assert.match(app, /gte: 'lớn hơn hoặc bằng'/);
   assert.match(app, /lte: 'nhỏ hơn hoặc bằng'/);
   assert.match(app, /contains: 'chứa'/);
+  assert.match(app, /in: 'thuộc danh sách'/);
   assert.match(app, /trialTarget\.inputs\[portId\] = \{ kind: 'node', nodeId: sourceId \}/);
   assert.match(app, /V3\.validateRecipe\(trial, currentFields\(\)\)/);
   assert.match(app, /nodeReferenceLabel\(sourceNode, recipe\)/);
