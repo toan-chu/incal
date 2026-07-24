@@ -2,10 +2,10 @@
   "schemaVersion": 3,
   "id": "TRUSTANA-Q1",
   "name": "Trustana Incentive Q1 (auto-tier, FIN method)",
-  "version": "1.0.0",
+  "version": 6,
   "sourceSchema": {
     "sourceSchemaVersion": 2,
-    "fingerprint": "FNV1A-cd03bc7f-28",
+    "fingerprint": "FNV1A-e51e7e2b-40",
     "subjectTableId": "table:Nh%C3%A2n%20s%E1%BB%B1",
     "sheets": [
       {
@@ -64,12 +64,6 @@
             "header": "Trạng thái thu",
             "columnIndex": 7,
             "type": "Text"
-          },
-          {
-            "id": "source:Jobs::%25%20%C4%91%C3%A3%20thu",
-            "header": "% đã thu",
-            "columnIndex": 8,
-            "type": "Percent"
           }
         ]
       },
@@ -135,6 +129,18 @@
             "header": "HĐLĐ",
             "columnIndex": 8,
             "type": "Boolean"
+          },
+          {
+            "id": "source:Nh%C3%A2n%20s%E1%BB%B1::Ch%E1%BB%89%20ti%C3%AAu%20KH%20m%E1%BB%9Bi",
+            "header": "Chỉ tiêu KH mới",
+            "columnIndex": 9,
+            "type": "Number"
+          },
+          {
+            "id": "source:Nh%C3%A2n%20s%E1%BB%B1::KH%20m%E1%BB%9Bi%20%C4%91%E1%BA%A1t",
+            "header": "KH mới đạt",
+            "columnIndex": 10,
+            "type": "Number"
           }
         ]
       },
@@ -193,6 +199,77 @@
             "header": "Số tháng quá hạn",
             "columnIndex": 3,
             "type": "Number"
+          },
+          {
+            "id": "source:C%C3%B4ng%20n%E1%BB%A3%20chi%20ti%E1%BA%BFt::Team",
+            "header": "Team",
+            "columnIndex": 4,
+            "type": "Text"
+          },
+          {
+            "id": "source:C%C3%B4ng%20n%E1%BB%A3%20chi%20ti%E1%BA%BFt::Nh%C3%A2n%20t%E1%BB%91%20ph%E1%BA%A1t",
+            "header": "Nhân tố phạt",
+            "columnIndex": 5,
+            "type": "Text"
+          }
+        ]
+      },
+      {
+        "tableId": "table:Quy%20t%E1%BA%AFc%20ph%E1%BA%A1t",
+        "name": "Quy tắc phạt",
+        "label": "Quy tắc phạt",
+        "role": "Tra cứu",
+        "headerRow": 0,
+        "rowCount": 2,
+        "keyFieldId": "source:Quy%20t%E1%BA%AFc%20ph%E1%BA%A1t::%C6%AFu%20ti%C3%AAn",
+        "fields": [
+          {
+            "id": "source:Quy%20t%E1%BA%AFc%20ph%E1%BA%A1t::%C6%AFu%20ti%C3%AAn",
+            "header": "Ưu tiên",
+            "columnIndex": 0,
+            "type": "Number"
+          },
+          {
+            "id": "source:Quy%20t%E1%BA%AFc%20ph%E1%BA%A1t::Job",
+            "header": "Job",
+            "columnIndex": 1,
+            "type": "Text"
+          },
+          {
+            "id": "source:Quy%20t%E1%BA%AFc%20ph%E1%BA%A1t::Team",
+            "header": "Team",
+            "columnIndex": 2,
+            "type": "Text"
+          },
+          {
+            "id": "source:Quy%20t%E1%BA%AFc%20ph%E1%BA%A1t::Nh%C3%A2n%20t%E1%BB%91%20ph%E1%BA%A1t",
+            "header": "Nhân tố phạt",
+            "columnIndex": 3,
+            "type": "Text"
+          },
+          {
+            "id": "source:Quy%20t%E1%BA%AFc%20ph%E1%BA%A1t::T%E1%BB%AB%20th%C3%A1ng%20qu%C3%A1%20h%E1%BA%A1n",
+            "header": "Từ tháng quá hạn",
+            "columnIndex": 4,
+            "type": "Number"
+          },
+          {
+            "id": "source:Quy%20t%E1%BA%AFc%20ph%E1%BA%A1t::%C4%90%E1%BA%BFn%20th%C3%A1ng%20qu%C3%A1%20h%E1%BA%A1n",
+            "header": "Đến tháng quá hạn",
+            "columnIndex": 5,
+            "type": "Number"
+          },
+          {
+            "id": "source:Quy%20t%E1%BA%AFc%20ph%E1%BA%A1t::T%E1%BB%B7%20l%E1%BB%87%20ph%E1%BA%A1t",
+            "header": "Tỷ lệ phạt",
+            "columnIndex": 6,
+            "type": "Percent"
+          },
+          {
+            "id": "source:Quy%20t%E1%BA%AFc%20ph%E1%BA%A1t::Ghi%20ch%C3%BA",
+            "header": "Ghi chú",
+            "columnIndex": 7,
+            "type": "Text"
           }
         ]
       }
@@ -214,6 +291,21 @@
         "derivedFieldLabel": "Mức"
       },
       {
+        "id": "pen:prate",
+        "recipeId": "pen",
+        "nodeId": "prate",
+        "targetTableId": "table:Quy%20t%E1%BA%AFc%20ph%E1%BA%A1t",
+        "lookupFieldId": "source:Quy%20t%E1%BA%AFc%20ph%E1%BA%A1t::T%E1%BB%B7%20l%E1%BB%87%20ph%E1%BA%A1t",
+        "returnFieldId": "derived.penalty_rate",
+        "source": {
+          "kind": "node",
+          "nodeId": "psrc"
+        },
+        "sourceKeyFieldId": "source:C%C3%B4ng%20n%E1%BB%A3%20chi%20ti%E1%BA%BFt::Job",
+        "derivedFieldId": "derived.penalty_rate",
+        "derivedFieldLabel": "Tỷ lệ phạt hiệu lực"
+      },
+      {
         "id": "tax:ml",
         "recipeId": "tax",
         "nodeId": "ml",
@@ -227,6 +319,21 @@
         "sourceKeyFieldId": "source:Jobs::Kh%C3%A1ch%20h%C3%A0ng",
         "derivedFieldId": "derived.muc",
         "derivedFieldLabel": "Mức"
+      },
+      {
+        "id": "tax:prate",
+        "recipeId": "tax",
+        "nodeId": "prate",
+        "targetTableId": "table:Quy%20t%E1%BA%AFc%20ph%E1%BA%A1t",
+        "lookupFieldId": "source:Quy%20t%E1%BA%AFc%20ph%E1%BA%A1t::T%E1%BB%B7%20l%E1%BB%87%20ph%E1%BA%A1t",
+        "returnFieldId": "derived.penalty_rate",
+        "source": {
+          "kind": "node",
+          "nodeId": "psrc"
+        },
+        "sourceKeyFieldId": "source:C%C3%B4ng%20n%E1%BB%A3%20chi%20ti%E1%BA%BFt::Job",
+        "derivedFieldId": "derived.penalty_rate",
+        "derivedFieldLabel": "Tỷ lệ phạt hiệu lực"
       }
     ],
     "issues": []
@@ -285,8 +392,8 @@
           },
           "config": {
             "fieldId": "source:Jobs::Team",
-            "operator": "eq",
-            "value": "COM"
+            "operator": "in",
+            "value": "General, New, KAE Admin, KAE Sale"
           }
         },
         {
@@ -389,6 +496,77 @@
           }
         },
         {
+          "id": "new_customer_achieved",
+          "blockId": "arithmetic",
+          "inputs": {
+            "left": {
+              "kind": "field",
+              "fieldId": "source:Nh%C3%A2n%20s%E1%BB%B1::KH%20m%E1%BB%9Bi%20%C4%91%E1%BA%A1t"
+            },
+            "right": {
+              "kind": "literal",
+              "type": "Number",
+              "value": 0
+            }
+          },
+          "config": {
+            "operator": "+"
+          },
+          "meta": {
+            "canvas": {
+              "x": 846,
+              "y": 570
+            }
+          }
+        },
+        {
+          "id": "new_customer_delta",
+          "blockId": "arithmetic",
+          "inputs": {
+            "left": {
+              "kind": "node",
+              "nodeId": "new_customer_achieved"
+            },
+            "right": {
+              "kind": "field",
+              "fieldId": "source:Nh%C3%A2n%20s%E1%BB%B1::Ch%E1%BB%89%20ti%C3%AAu%20KH%20m%E1%BB%9Bi"
+            }
+          },
+          "config": {
+            "operator": "-"
+          },
+          "meta": {
+            "canvas": {
+              "x": 1068,
+              "y": 570
+            }
+          }
+        },
+        {
+          "id": "new_customer_adjustment",
+          "blockId": "arithmetic",
+          "inputs": {
+            "left": {
+              "kind": "node",
+              "nodeId": "new_customer_delta"
+            },
+            "right": {
+              "kind": "literal",
+              "type": "Percent",
+              "value": 0.01
+            }
+          },
+          "config": {
+            "operator": "*"
+          },
+          "meta": {
+            "canvas": {
+              "x": 1282,
+              "y": 570
+            }
+          }
+        },
+        {
           "id": "wf",
           "blockId": "macro.waterfall",
           "inputs": {
@@ -409,8 +587,8 @@
               "fieldId": "source:Nh%C3%A2n%20s%E1%BB%B1::Target%20qu%C3%BD"
             },
             "adjustment": {
-              "kind": "field",
-              "fieldId": "source:Nh%C3%A2n%20s%E1%BB%B1::%C4%90i%E1%BB%81u%20ch%E1%BB%89nh%20%25"
+              "kind": "node",
+              "nodeId": "new_customer_adjustment"
             }
           },
           "config": {
@@ -444,12 +622,45 @@
           }
         },
         {
+          "id": "prate",
+          "blockId": "map_rule_rate",
+          "inputs": {
+            "table": {
+              "kind": "node",
+              "nodeId": "psrc"
+            }
+          },
+          "config": {
+            "table": "table:Quy%20t%E1%BA%AFc%20ph%E1%BA%A1t",
+            "sourceJobFieldId": "source:C%C3%B4ng%20n%E1%BB%A3%20chi%20ti%E1%BA%BFt::Job",
+            "sourceTeamFieldId": "source:C%C3%B4ng%20n%E1%BB%A3%20chi%20ti%E1%BA%BFt::Team",
+            "sourceFactorFieldId": "source:C%C3%B4ng%20n%E1%BB%A3%20chi%20ti%E1%BA%BFt::Nh%C3%A2n%20t%E1%BB%91%20ph%E1%BA%A1t",
+            "sourceMonthsFieldId": "source:C%C3%B4ng%20n%E1%BB%A3%20chi%20ti%E1%BA%BFt::S%E1%BB%91%20th%C3%A1ng%20qu%C3%A1%20h%E1%BA%A1n",
+            "rulePriorityFieldId": "source:Quy%20t%E1%BA%AFc%20ph%E1%BA%A1t::%C6%AFu%20ti%C3%AAn",
+            "ruleJobFieldId": "source:Quy%20t%E1%BA%AFc%20ph%E1%BA%A1t::Job",
+            "ruleTeamFieldId": "source:Quy%20t%E1%BA%AFc%20ph%E1%BA%A1t::Team",
+            "ruleFactorFieldId": "source:Quy%20t%E1%BA%AFc%20ph%E1%BA%A1t::Nh%C3%A2n%20t%E1%BB%91%20ph%E1%BA%A1t",
+            "ruleMinMonthsFieldId": "source:Quy%20t%E1%BA%AFc%20ph%E1%BA%A1t::T%E1%BB%AB%20th%C3%A1ng%20qu%C3%A1%20h%E1%BA%A1n",
+            "ruleMaxMonthsFieldId": "source:Quy%20t%E1%BA%AFc%20ph%E1%BA%A1t::%C4%90%E1%BA%BFn%20th%C3%A1ng%20qu%C3%A1%20h%E1%BA%A1n",
+            "ruleRateFieldId": "source:Quy%20t%E1%BA%AFc%20ph%E1%BA%A1t::T%E1%BB%B7%20l%E1%BB%87%20ph%E1%BA%A1t",
+            "defaultRate": 0.01,
+            "derivedFieldId": "derived.penalty_rate",
+            "derivedFieldLabel": "Tỷ lệ phạt hiệu lực"
+          },
+          "meta": {
+            "canvas": {
+              "x": 278,
+              "y": 498
+            }
+          }
+        },
+        {
           "id": "pbase",
           "blockId": "map_arithmetic",
           "inputs": {
             "table": {
               "kind": "node",
-              "nodeId": "psrc"
+              "nodeId": "prate"
             }
           },
           "config": {
@@ -481,9 +692,9 @@
             "leftLiteral": 0,
             "leftLiteralType": "Number",
             "operator": "*",
-            "rightMode": "literal",
-            "rightFieldId": "",
-            "rightLiteral": 0.01,
+            "rightMode": "field",
+            "rightFieldId": "derived.penalty_rate",
+            "rightLiteral": 0,
             "rightLiteralType": "Percent",
             "derivedFieldId": "derived.penalty_line",
             "derivedFieldLabel": "Phạt dòng tự tính"
@@ -555,8 +766,8 @@
           },
           "config": {
             "fieldId": "source:Jobs::Team",
-            "operator": "eq",
-            "value": "COM"
+            "operator": "in",
+            "value": "General, New, KAE Admin, KAE Sale"
           }
         },
         {
@@ -659,6 +870,77 @@
           }
         },
         {
+          "id": "new_customer_achieved",
+          "blockId": "arithmetic",
+          "inputs": {
+            "left": {
+              "kind": "field",
+              "fieldId": "source:Nh%C3%A2n%20s%E1%BB%B1::KH%20m%E1%BB%9Bi%20%C4%91%E1%BA%A1t"
+            },
+            "right": {
+              "kind": "literal",
+              "type": "Number",
+              "value": 0
+            }
+          },
+          "config": {
+            "operator": "+"
+          },
+          "meta": {
+            "canvas": {
+              "x": 846,
+              "y": 570
+            }
+          }
+        },
+        {
+          "id": "new_customer_delta",
+          "blockId": "arithmetic",
+          "inputs": {
+            "left": {
+              "kind": "node",
+              "nodeId": "new_customer_achieved"
+            },
+            "right": {
+              "kind": "field",
+              "fieldId": "source:Nh%C3%A2n%20s%E1%BB%B1::Ch%E1%BB%89%20ti%C3%AAu%20KH%20m%E1%BB%9Bi"
+            }
+          },
+          "config": {
+            "operator": "-"
+          },
+          "meta": {
+            "canvas": {
+              "x": 1068,
+              "y": 570
+            }
+          }
+        },
+        {
+          "id": "new_customer_adjustment",
+          "blockId": "arithmetic",
+          "inputs": {
+            "left": {
+              "kind": "node",
+              "nodeId": "new_customer_delta"
+            },
+            "right": {
+              "kind": "literal",
+              "type": "Percent",
+              "value": 0.01
+            }
+          },
+          "config": {
+            "operator": "*"
+          },
+          "meta": {
+            "canvas": {
+              "x": 1282,
+              "y": 570
+            }
+          }
+        },
+        {
           "id": "wf",
           "blockId": "macro.waterfall",
           "inputs": {
@@ -679,8 +961,8 @@
               "fieldId": "source:Nh%C3%A2n%20s%E1%BB%B1::Target%20qu%C3%BD"
             },
             "adjustment": {
-              "kind": "field",
-              "fieldId": "source:Nh%C3%A2n%20s%E1%BB%B1::%C4%90i%E1%BB%81u%20ch%E1%BB%89nh%20%25"
+              "kind": "node",
+              "nodeId": "new_customer_adjustment"
             }
           },
           "config": {
@@ -701,12 +983,45 @@
           }
         },
         {
+          "id": "prate",
+          "blockId": "map_rule_rate",
+          "inputs": {
+            "table": {
+              "kind": "node",
+              "nodeId": "psrc"
+            }
+          },
+          "config": {
+            "table": "table:Quy%20t%E1%BA%AFc%20ph%E1%BA%A1t",
+            "sourceJobFieldId": "source:C%C3%B4ng%20n%E1%BB%A3%20chi%20ti%E1%BA%BFt::Job",
+            "sourceTeamFieldId": "source:C%C3%B4ng%20n%E1%BB%A3%20chi%20ti%E1%BA%BFt::Team",
+            "sourceFactorFieldId": "source:C%C3%B4ng%20n%E1%BB%A3%20chi%20ti%E1%BA%BFt::Nh%C3%A2n%20t%E1%BB%91%20ph%E1%BA%A1t",
+            "sourceMonthsFieldId": "source:C%C3%B4ng%20n%E1%BB%A3%20chi%20ti%E1%BA%BFt::S%E1%BB%91%20th%C3%A1ng%20qu%C3%A1%20h%E1%BA%A1n",
+            "rulePriorityFieldId": "source:Quy%20t%E1%BA%AFc%20ph%E1%BA%A1t::%C6%AFu%20ti%C3%AAn",
+            "ruleJobFieldId": "source:Quy%20t%E1%BA%AFc%20ph%E1%BA%A1t::Job",
+            "ruleTeamFieldId": "source:Quy%20t%E1%BA%AFc%20ph%E1%BA%A1t::Team",
+            "ruleFactorFieldId": "source:Quy%20t%E1%BA%AFc%20ph%E1%BA%A1t::Nh%C3%A2n%20t%E1%BB%91%20ph%E1%BA%A1t",
+            "ruleMinMonthsFieldId": "source:Quy%20t%E1%BA%AFc%20ph%E1%BA%A1t::T%E1%BB%AB%20th%C3%A1ng%20qu%C3%A1%20h%E1%BA%A1n",
+            "ruleMaxMonthsFieldId": "source:Quy%20t%E1%BA%AFc%20ph%E1%BA%A1t::%C4%90%E1%BA%BFn%20th%C3%A1ng%20qu%C3%A1%20h%E1%BA%A1n",
+            "ruleRateFieldId": "source:Quy%20t%E1%BA%AFc%20ph%E1%BA%A1t::T%E1%BB%B7%20l%E1%BB%87%20ph%E1%BA%A1t",
+            "defaultRate": 0.01,
+            "derivedFieldId": "derived.penalty_rate",
+            "derivedFieldLabel": "Tỷ lệ phạt hiệu lực"
+          },
+          "meta": {
+            "canvas": {
+              "x": 278,
+              "y": 498
+            }
+          }
+        },
+        {
           "id": "pbase",
           "blockId": "map_arithmetic",
           "inputs": {
             "table": {
               "kind": "node",
-              "nodeId": "psrc"
+              "nodeId": "prate"
             }
           },
           "config": {
@@ -738,9 +1053,9 @@
             "leftLiteral": 0,
             "leftLiteralType": "Number",
             "operator": "*",
-            "rightMode": "literal",
-            "rightFieldId": "",
-            "rightLiteral": 0.01,
+            "rightMode": "field",
+            "rightFieldId": "derived.penalty_rate",
+            "rightLiteral": 0,
             "rightLiteralType": "Percent",
             "derivedFieldId": "derived.penalty_line",
             "derivedFieldLabel": "Phạt dòng tự tính"

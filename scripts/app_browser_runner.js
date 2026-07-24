@@ -149,15 +149,15 @@ async function main() {
     await page.waitForFunction(() => window.__INCAL_V3__?.state?.preset?.id === 'TRUSTANA-Q1');
 
     await page.locator('#excelInput').setInputFiles(samplePath);
-    await page.waitForFunction(() => window.__INCAL_V3__?.state?.sourceSchema?.sheets?.length === 4);
+    await page.waitForFunction(() => window.__INCAL_V3__?.state?.sourceSchema?.sheets?.length === 5);
     await page.waitForFunction(() => window.__INCAL_V3__?.state?.compatibility === 'exact');
-    assert.equal(await page.locator('#metricSheets').textContent(), '4');
-    assert.equal(await page.locator('#metricFields').textContent(), '24');
-    assert.equal(await page.locator('.sheet-panel').count(), 4, 'all source sheets become tables');
-    assert.equal(await page.locator('.source-field').count(), 24, 'all headers become fields');
+    assert.equal(await page.locator('#metricSheets').textContent(), '5');
+    assert.equal(await page.locator('#metricFields').textContent(), '35');
+    assert.equal(await page.locator('.sheet-panel').count(), 5, 'all source sheets become tables');
+    assert.equal(await page.locator('.source-field').count(), 35, 'all headers become fields');
     assert.equal(await page.locator('.sheet-panel.is-subject').count(), 1, 'exactly one subject table');
     const entityText = await page.locator('#sheetList').textContent();
-    for (const sheet of ['Jobs', 'Nhân sự', 'Khách hàng', 'Công nợ chi tiết']) assert.match(entityText, new RegExp(sheet.replace(/[&]/g, '\\&')));
+    for (const sheet of ['Jobs', 'Nhân sự', 'Khách hàng', 'Công nợ chi tiết', 'Quy tắc phạt']) assert.match(entityText, new RegExp(sheet.replace(/[&]/g, '\\&')));
     assert.doesNotMatch(entityText, /Bỏ qua/i);
     const fieldLabels = await page.locator('.source-field strong').allTextContents();
     assert.ok(fieldLabels.includes('GP'));
@@ -172,7 +172,7 @@ async function main() {
     ]);
 
     await page.locator('[data-tab="calculate"]').click();
-    assert.equal(await page.locator('#calculationSubject option').count(), 4, 'the Calculate tab offers every workbook table as a subject');
+    assert.equal(await page.locator('#calculationSubject option').count(), 5, 'the Calculate tab offers every workbook table as a subject');
     await page.locator('#calculationSubject').selectOption(schema.tableIdForSheet('Jobs'));
     await page.locator('[data-tab="input"]').click();
     assert.match(await page.locator('.sheet-panel.is-subject summary').textContent(), /Jobs/, 'changing the calculation subject activates the matching sheet card');
@@ -187,9 +187,11 @@ async function main() {
     ], 'each subject table restores its own identity mapping');
 
     await page.locator('[data-tab="formulas"]').click();
-    assert.equal(await page.locator('.library-block').count(), 19, '16 primitive + 3 macros');
+    assert.equal(await page.locator('.library-block').count(), 21, '18 primitive + 3 macros');
     assert.equal(await page.locator('.library-block[data-block-id="map_lookup"]').count(), 1, 'Claude map-lookup primitive is visible in the block library');
     assert.equal(await page.locator('.library-block[data-block-id="map_arithmetic"]').count(), 1, 'Tính cột primitive is visible in the block library');
+    assert.equal(await page.locator('.library-block[data-block-id="map_rule_rate"]').count(), 1, 'rate policy primitive is visible in the block library');
+    assert.equal(await page.locator('.library-block[data-block-id="count_distinct"]').count(), 1, 'distinct counter primitive is visible in the block library');
     assert.equal(await page.locator('.preset-actions .button').count(), 2, 'only Load and Save preset actions remain');
     assert.equal(await page.locator('#savePreset').isEnabled(), true, 'valid Trustana preset can export');
     assert.equal(await page.locator('#subjectBridge').count(), 0, 'duplicate Subject Bridge is removed');
@@ -302,10 +304,10 @@ async function main() {
     assert.equal(await page.locator('#nodeContextMenu').isHidden(), true, 'switching after recipe deletion clears the node menu');
 
     await selectRecipe('com');
-    await page.waitForFunction(() => document.querySelectorAll('.graph-edge-visual').length === 12);
-    assert.equal(await page.locator('.graph-node').count(), 11, 'COM recipe renders eleven graph nodes');
-    assert.equal(await page.locator('.graph-edge-visual').count(), 12, 'all COM node inputs render as bezier connections');
-    assert.equal(await page.locator('.graph-edge-hit').count(), 12, 'each edge has a wide transparent hit path');
+    await page.waitForFunction(() => document.querySelectorAll('.graph-edge-visual').length > 0);
+    assert.equal(await page.locator('.graph-node').count(), 14, 'COM recipe renders fourteen graph nodes');
+    assert.equal(await page.locator('.graph-edge-visual').count(), 15, 'all COM node inputs render as bezier connections');
+    assert.equal(await page.locator('.graph-edge-hit').count(), 15, 'each edge has a wide transparent hit path');
     assert.equal(await page.locator('.result-badge').count(), 1, 'COM has one automatic result sink');
     assert.equal(await page.locator('[data-set-output]').count(), 0, 'manual output control is absent');
     await page.locator('.graph-node[data-node-id="f1"] .node-head').dblclick();
@@ -439,7 +441,7 @@ async function main() {
     await page.locator('#closeNodeSettings').click();
     await page.locator('.graph-node[data-node-id="debt"] .node-head').dblclick();
     const lookupTables = await page.locator('#inspector select[data-config="table"] option').allTextContents();
-    assert.equal(lookupTables.length, 4, 'lookup can target every table');
+    assert.equal(lookupTables.length, 5, 'lookup can target every table');
     assert.match(await page.locator('#inspector select[data-config="lookupFieldId"]').textContent(), /Mã NV/);
     assert.match(await page.locator('#inspector select[data-config="returnFieldId"]').textContent(), /Lương T1/);
     await page.locator('#closeNodeSettings').click();
@@ -499,7 +501,7 @@ async function main() {
     await page.locator('[data-tab="calculate"]').click();
     await page.locator('#calculateButton:enabled').waitFor();
     assert.equal(await page.locator('#metricPeople').textContent(), '1');
-    assert.equal(await page.locator('#metricJobs').textContent(), '4');
+    assert.equal(await page.locator('#metricJobs').textContent(), '5');
     assert.equal(await page.locator('#metricSchema').textContent(), 'AUTO');
     await page.locator('#calculateButton').click();
     await page.locator('#resultsBody tr').first().waitFor();
@@ -627,8 +629,8 @@ async function main() {
     assert.deepEqual(pageErrors, [], `page errors: ${pageErrors.join(' | ')}`);
     assert.deepEqual(failedRequests, [], `failed requests: ${failedRequests.join(' | ')}`);
     console.log(JSON.stringify({
-      status: 'pass', url: appUrl, tabs: 4, sheets: 4, fields: 24, blocks: 19,
-      autoMapped: true, mismatchBlocked: true, subjectRows: 1, tables: 4,
+      status: 'pass', url: appUrl, tabs: 4, sheets: 5, fields: 35, blocks: 21,
+      autoMapped: true, mismatchBlocked: true, subjectRows: 1, tables: 5,
       trustanaNets: trustanaReport.per_person.map((person) => person.netPay),
       lookupResult: report.per_person[0].netPay, netPay: report.totals.netPay,
       dashboardReports: 2, persistedKeys: persisted.keys, sensitiveRowsPersisted: false, brand,

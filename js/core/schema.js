@@ -142,7 +142,7 @@
     const recipes = clone(input.recipes || []);
     for (const recipe of recipes) {
       for (const node of recipe.nodes || []) {
-        if (!['source', 'lookup', 'map_lookup'].includes(node.blockId)) continue;
+        if (!['source', 'lookup', 'map_lookup', 'map_rule_rate'].includes(node.blockId)) continue;
         const table = node.config?.table;
         if (legacyTables.has(table)) node.config.table = legacyTables.get(table);
       }
@@ -165,16 +165,16 @@
     const relations = [];
     for (const recipe of preset.recipes || []) {
       for (const node of recipe.nodes || []) {
-        if (!['lookup', 'map_lookup'].includes(node.blockId)) continue;
+        if (!['lookup', 'map_lookup', 'map_rule_rate'].includes(node.blockId)) continue;
         relations.push({
           id: `${recipe.id}:${node.id}`,
           recipeId: recipe.id,
           nodeId: node.id,
           targetTableId: String(node.config?.table || ''),
-          lookupFieldId: String(node.config?.lookupFieldId || ''),
-          returnFieldId: String(node.config?.returnFieldId || ''),
-          source: clone(node.blockId === 'map_lookup' ? node.inputs?.table || null : node.inputs?.key || null),
-          sourceKeyFieldId: String(node.config?.sourceKeyFieldId || ''),
+          lookupFieldId: String(node.config?.lookupFieldId || node.config?.ruleRateFieldId || ''),
+          returnFieldId: String(node.config?.returnFieldId || node.config?.derivedFieldId || ''),
+          source: clone(['map_lookup', 'map_rule_rate'].includes(node.blockId) ? node.inputs?.table || null : node.inputs?.key || null),
+          sourceKeyFieldId: String(node.config?.sourceKeyFieldId || node.config?.sourceJobFieldId || ''),
           derivedFieldId: String(node.config?.derivedFieldId || ''),
           derivedFieldLabel: String(node.config?.derivedFieldLabel || '')
         });

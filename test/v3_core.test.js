@@ -31,9 +31,9 @@ function sampleWorkbook() {
   return XLSX.read(fs.readFileSync(path.join(__dirname, '..', 'INPUT-Incentive-mau.xlsx')), { type: 'buffer', cellDates: true });
 }
 
-test('v3 registry remains exactly 16 primitive blocks and 3 locked macros', () => {
+test('v3 registry remains exactly 18 primitive blocks and 3 locked macros', () => {
   const blocks = registry.listBlocks();
-  assert.equal(blocks.filter((block) => !block.lockedMacro).length, 16);
+  assert.equal(blocks.filter((block) => !block.lockedMacro).length, 18);
   assert.equal(blocks.filter((block) => block.lockedMacro).length, 3);
 });
 
@@ -158,6 +158,70 @@ test('map arithmetic chains derived fields for a three-factor row calculation wi
   assert.ok(debtRows.every((row) => !Object.hasOwn(row, 'derived:revenue-months') && !Object.hasOwn(row, 'derived:penalty-row')));
 });
 
+test('rate policy derives default, job and multi-factor penalty rates with deterministic precedence', () => {
+  const fields = [
+    { id: 'debt.job', label: 'Job', type: 'Text', table: 'debt' },
+    { id: 'debt.team', label: 'Team', type: 'Text', table: 'debt' },
+    { id: 'debt.factor', label: 'Nhân tố phạt', type: 'Text', table: 'debt' },
+    { id: 'debt.months', label: 'Số tháng quá hạn', type: 'Number', table: 'debt' },
+    { id: 'rules.priority', label: 'Ưu tiên', type: 'Number', table: 'rules' },
+    { id: 'rules.job', label: 'Job', type: 'Text', table: 'rules' },
+    { id: 'rules.team', label: 'Team', type: 'Text', table: 'rules' },
+    { id: 'rules.factor', label: 'Nhân tố phạt', type: 'Text', table: 'rules' },
+    { id: 'rules.minMonths', label: 'Từ tháng quá hạn', type: 'Number', table: 'rules' },
+    { id: 'rules.maxMonths', label: 'Đến tháng quá hạn', type: 'Number', table: 'rules' },
+    { id: 'rules.rate', label: 'Tỷ lệ phạt', type: 'Percent', table: 'rules' }
+  ];
+  const config = {
+    table: 'rules', sourceJobFieldId: 'debt.job', sourceTeamFieldId: 'debt.team', sourceFactorFieldId: 'debt.factor', sourceMonthsFieldId: 'debt.months',
+    rulePriorityFieldId: 'rules.priority', ruleJobFieldId: 'rules.job', ruleTeamFieldId: 'rules.team', ruleFactorFieldId: 'rules.factor',
+    ruleMinMonthsFieldId: 'rules.minMonths', ruleMaxMonthsFieldId: 'rules.maxMonths', ruleRateFieldId: 'rules.rate',
+    defaultRate: 0.01, derivedFieldId: 'derived:penalty-rate', derivedFieldLabel: 'Tỷ lệ phạt hiệu lực'
+  };
+  const recipe = schema.createRecipe({ id: 'penalty-rate-policy', nodes: [
+    { id: 'src', blockId: 'source', inputs: {}, config: { table: 'debt', ownerFieldId: '' } },
+    { id: 'rate', blockId: 'map_rule_rate', inputs: { table: { kind: 'node', nodeId: 'src' } }, config }
+  ], output: { nodeId: 'rate', type: 'Table' } });
+  const debt = [
+    { 'debt.job': 'J1', 'debt.team': 'COM', 'debt.factor': 'No invoice', 'debt.months': 3 },
+    { 'debt.job': 'J2', 'debt.team': 'COM', 'debt.factor': '', 'debt.months': 1 },
+    { 'debt.job': 'J3', 'debt.team': '', 'debt.factor': '', 'debt.months': 2 }
+  ];
+  const rules = [
+    { 'rules.priority': 2, 'rules.job': '', 'rules.team': 'COM', 'rules.factor': '', 'rules.minMonths': 0, 'rules.maxMonths': '', 'rules.rate': 0.02 },
+    { 'rules.priority': 1, 'rules.job': '', 'rules.team': 'COM', 'rules.factor': 'No invoice', 'rules.minMonths': 3, 'rules.maxMonths': '', 'rules.rate': 0.03 },
+    { 'rules.priority': 1, 'rules.job': 'J2', 'rules.team': '', 'rules.factor': '', 'rules.minMonths': '', 'rules.maxMonths': '', 'rules.rate': 0.02 }
+  ];
+  const output = engine.executeRecipe(recipe, { fields, tables: { debt, rules } });
+  assert.deepEqual(output.value.map((row) => row['derived:penalty-rate']), [0.03, 0.02, 0.01]);
+  assert.deepEqual(output.trace.nodes.find((node) => node.nodeId === 'rate').detail, { rowCount: 3, matchedCount: 2, defaultCount: 1, appliedRuleRows: [3, 4], derivedFieldId: 'derived:penalty-rate' });
+  assert.ok(debt.every((row) => !Object.hasOwn(row, 'derived:penalty-rate')), 'policy mapping leaves raw workbook rows immutable');
+  const invalid = schema.clone(recipe);
+  invalid.nodes[1].config = Object.assign({}, config, { defaultRate: 1.1, ruleRateFieldId: 'rules.team' });
+  const errors = validator.validateRecipe(invalid, fields).errors;
+  assert.ok(errors.some((error) => error.portId === 'defaultRate'));
+  assert.ok(errors.some((error) => error.portId === 'ruleRateFieldId' && error.code === 'TYPE_MISMATCH'));
+});
+
+test('distinct Mức 3 customers minus target becomes the typed ±1% waterfall adjustment', () => {
+  const fields = [
+    { id: 'jobs.customer', label: 'Khách hàng', type: 'Text', table: 'jobs' },
+    { id: 'roster.newCustomerTarget', label: 'Chỉ tiêu KH mới', type: 'Number', table: 'roster' }
+  ];
+  const recipe = schema.createRecipe({ id: 'new-customer-adjustment', nodes: [
+    { id: 'src', blockId: 'source', inputs: {}, config: { table: 'jobs', ownerFieldId: '' } },
+    { id: 'count', blockId: 'count_distinct', inputs: { table: { kind: 'node', nodeId: 'src' } }, config: { fieldId: 'jobs.customer' } },
+    { id: 'delta', blockId: 'arithmetic', inputs: { left: { kind: 'node', nodeId: 'count' }, right: { kind: 'field', fieldId: 'roster.newCustomerTarget' } }, config: { operator: '-' } },
+    { id: 'adjustment', blockId: 'arithmetic', inputs: { left: { kind: 'node', nodeId: 'delta' }, right: { kind: 'literal', type: 'Percent', value: 0.01 } }, config: { operator: '*' } }
+  ], output: { nodeId: 'adjustment', type: 'Percent' } });
+  const validation = validator.validateRecipe(recipe, fields);
+  assert.equal(validation.valid, true);
+  assert.equal(validation.outputTypes.get('adjustment'), 'Percent');
+  const output = engine.executeRecipe(recipe, { fields, tables: { jobs: [{ 'jobs.customer': 'A' }, { 'jobs.customer': 'A' }, { 'jobs.customer': 'B' }] }, currentPerson: { 'roster.newCustomerTarget': 3 } });
+  assert.equal(output.value, -0.01);
+  assert.deepEqual(output.trace.nodes.find((node) => node.nodeId === 'count').detail, { rowCount: 3, distinctCount: 2, fieldId: 'jobs.customer' });
+});
+
 test('map arithmetic type-check rejects text math and literal division by zero', () => {
   const fields = [
     { id: 'rows.label', label: 'Nhãn', type: 'Text', table: 'rows' },
@@ -263,10 +327,10 @@ test('dynamic Job and Nhân sự fields run together and keep component-job-bloc
   assert.deepEqual(result.per_person[0].trace.components[0].nodes[1].jobIds, ['J-01']);
 });
 
-test('four-sheet sample becomes four user-defined entities and subject table controls result grain', () => {
+test('five-sheet sample becomes user-defined entities and subject table controls result grain', () => {
   const book = sampleWorkbook();
   const source = xlsx.prepareSourceSchema(xlsx.discoverWorkbook(book, XLSX));
-  assert.equal(source.sheets.length, 4);
+  assert.equal(source.sheets.length, 5);
   assert.equal(source.sheets.some((table) => table.role === 'ignore'), false);
   assert.equal(schema.subjectTable(source).name, 'Nhân sự');
   const peopleData = xlsx.materializeWorkbook(book, source, xlsx.suggestBindings(source, {}), XLSX);
@@ -293,19 +357,46 @@ test('lookup crosses from a Job row to the customer table by key without changin
   assert.equal(result.value, 'Mức 3');
 });
 
-test('official Q1 preset derives penalty rows and preserves the approved zero-delta NET', () => {
+test('official Q1 preset derives penalty rows and calculates take-home after tax', () => {
   const book = sampleWorkbook();
   const preset = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'presets', 'trustana-q1.json'), 'utf8'));
+  const discoveredSource = xlsx.discoverWorkbook(book, XLSX);
+  const jobs = discoveredSource.sheets.find((sheet) => sheet.name === 'Jobs');
+  assert.equal(jobs.fields.some((field) => field.header === '% đã thu'), false);
+  assert.equal(jobs.fields.some((field) => field.header === 'Trạng thái thu'), true);
+  assert.equal(discoveredSource.fingerprint, preset.sourceSchema.fingerprint);
   const data = xlsx.materializeWorkbook(book, preset.sourceSchema, preset.bindings, XLSX);
   const result = engine.runPreset(preset, Object.assign({ quarter: 'Q1-2026' }, data));
   assert.equal(result.validation.valid, true);
   assert.equal(result.per_person.length, 1);
   assert.equal(result.per_person[0].penalty, 2676672);
   assert.equal(result.per_person[0].netPay, 12516386);
-  assert.equal(result.per_person[0].netPay - 12516386, 0);
+  assert.equal(result.per_person[0].tax.totalTax, 1390710);
   const penaltyRecipe = preset.recipes.find((recipe) => recipe.component === 'penalty');
-  assert.deepEqual(penaltyRecipe.nodes.map((node) => node.blockId), ['source', 'map_arithmetic', 'map_arithmetic', 'scan_sum']);
+  assert.deepEqual(penaltyRecipe.nodes.map((node) => node.blockId), ['source', 'map_rule_rate', 'map_arithmetic', 'map_arithmetic', 'scan_sum']);
   assert.equal(preset.sourceSchema.sheets.some((sheet) => sheet.fields.some((field) => field.header === 'Phạt dòng')), false);
+  assert.equal(preset.recipes.find((recipe) => recipe.component === 'tax').enabled, true);
+});
+
+test('Q1 input matches the FIN Total Incentive gold values when FIN Mức đạt is entered', () => {
+  const current = XLSX.read(fs.readFileSync(path.join(__dirname, '..', '2026Q1-Incentive-Table.xlsx')), { type: 'buffer', cellDates: true });
+  const legacy = XLSX.read(fs.readFileSync(path.join(__dirname, '..', 'docs', '2026Q1_Incentive- (TEST) - Copy.xlsx')), { type: 'buffer', cellDates: true });
+  const preset = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'presets', 'trustana-q1.json'), 'utf8'));
+  const currentSource = xlsx.discoverWorkbook(current, XLSX);
+  assert.equal(xlsx.compareSourceSchema(preset.sourceSchema, currentSource).exact, true);
+  const data = xlsx.materializeWorkbook(current, preset.sourceSchema, preset.bindings, XLSX);
+  const result = engine.runPreset(preset, Object.assign({ quarter: 'Q1-2026' }, data));
+  const goldRows = XLSX.utils.sheet_to_json(legacy.Sheets['KQ Sale. (7)'], { header: 1, defval: null, raw: true }).slice(4, 11);
+  const goldByEmployee = new Map(goldRows.filter((row) => row[1]).map((row) => [row[1], Math.round(row[27] || 0)]));
+  assert.deepEqual(result.per_person.map((person) => [person.employeeId, person.grossIncentive - person.penalty, person.netPay]), [
+    ['TTN22.005', goldByEmployee.get('TTN22.005'), 156942766],
+    ['TTN24.002', goldByEmployee.get('TTN24.002'), 20078187],
+    ['TTN24.006', goldByEmployee.get('TTN24.006'), 12516386],
+    ['TTN25.001', goldByEmployee.get('TTN25.001'), 31211090],
+    ['TTN25.005', goldByEmployee.get('TTN25.005'), 37658043],
+    ['TTN25.010', goldByEmployee.get('TTN25.010'), 0],
+    ['TTN25.099', 0, 0]
+  ]);
 });
 
 test('exact reload preserves N-table labels, roles, keys, subject and lookup relation', () => {

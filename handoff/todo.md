@@ -833,6 +833,82 @@ Codex đọc trước: `handoff/REVIEW-Claude_Drag-Drop-Calculator.md` (14 quy�
 | 4 | A reviewer inspects calculator safety | Arithmetic is composable, but unsupported fields, divide-by-zero, cycles and arbitrary code are blocked | pass |
 | 5 | Review packet is prepared for Claude | Confirmed rules, conflicts, recommendations and explicit review questions are clearly separated | pass |
 
+---
+
+## [2026-07-24 09:33] -- [AUTO] Tỷ lệ phạt theo chính sách và template FIN
+
+**Goal:** FIN xác nhận mức mặc định 1% áp dụng cho tất cả, nhưng cần đổi được 2%/3% theo job hoặc nhân tố mà không tự tính số tiền hay sửa canvas. Job không có Team vẫn được dùng mức mặc định; Team chỉ trở thành điều kiện khi FIN điền dữ liệu/rule tương ứng.
+
+### Technical execution plan -- Codex CTO
+
+- [x] P0 -- Khóa baseline và bổ sung contract `Áp tỷ lệ theo quy tắc` dạng `Table -> Table`; không đổi engine/rounding/macro.
+- [x] P1 -- Dựng precedence xác định: rule có số `Ưu tiên` nhỏ hơn thắng; sau đó giữ thứ tự dòng Excel. Job, Team, Nhân tố phạt và khoảng tháng để trống là wildcard; không khớp rule dùng default 1%.
+- [x] P2 -- Cập nhật preset Q1 để lấy `Tỷ lệ phạt hiệu lực` trước khi tính `Doanh thu sau thuế × Số tháng quá hạn × tỷ lệ`; cả nhánh Phạt và base Thuế dùng chung policy.
+- [x] P3 -- Nâng workbook mẫu: thêm `Team`, `Nhân tố phạt` ở Công nợ chi tiết và sheet `Quy tắc phạt`; chỉ có ví dụ không khớp sample, FIN thay/xóa theo kỳ. Không sửa workbook FIN thật.
+- [x] P4 -- Viết README theo luồng FIN: default 1%, rule ưu tiên, cách đặt 2%/3%, và lưu ý thiếu Team.
+- [x] P5 -- Thêm tests default/job/team-nhân tố/priority/immutable/invalid config; chạy full Node, QA app, schema/preset sample và kiểm tra workbook render.
+
+## Test Plan -- Tỷ lệ phạt theo chính sách
+
+| # | Scenario | Expected | Status |
+|---|---|---|---|
+| 1 | Không có rule khớp | Dùng mức mặc định 1% cho mọi dòng | pass |
+| 2 | Rule theo Job 2% | Chỉ đúng job đó nhận 2% | pass |
+| 3 | Rule Team + Nhân tố + tháng 3% | Chỉ dòng đủ mọi điều kiện mới nhận 3% | pass |
+| 4 | Hai rule cùng khớp | `Ưu tiên = 1` thắng `Ưu tiên = 2`; cùng priority giữ dòng Excel trước | pass |
+| 5 | Rule/field/rate cấu hình sai | Validator chặn trước khi chạy | pass |
+| 6 | Sample + preset Q1 | Phạt 2.676.672; NET 12.516.386; lệch 0 | pass |
+| 7 | Workbook mẫu mới | Sheet/cột rule rõ, render không cắt, schema preset khớp | pass |
+
+## [2026-07-24 10:10] -- [AUTO] Rút gọn trạng thái thu và đối chiếu Q1
+
+**Goal:** FIN chỉ nhập trạng thái `Paid` hoặc `Unpaid`; loại trường `% đã thu` không dùng khỏi template và fingerprint preset. Đối chiếu schema mới với workbook `2026Q1-Incentive-Table` nhưng không sửa dữ liệu FIN thật.
+
+### Technical execution plan -- Codex CTO
+
+- [x] P0 -- Gỡ `% đã thu` đồng bộ khỏi workbook mẫu, source schema preset và fixtures/assertion liên quan.
+- [x] P1 -- Đọc workbook Q1 theo chế độ chỉ đọc; so sheet, header, kiểu suy luận và cột bắt buộc với schema mới.
+- [x] P2 -- Chạy regression Node + file:// QA; báo cáo mọi mismatch theo mức chặn/cảnh báo/thông tin.
+
+## Test Plan -- Rút gọn trạng thái thu
+
+| # | Scenario | Expected | Status |
+|---|---|---|---|
+| 1 | File mẫu không còn `% đã thu` | Fingerprint 34 trường và app vẫn import/calculate được | pass |
+| 2 | FIN dùng `Paid`/`Unpaid` | Recipe Q1 vẫn chỉ lọc đúng trạng thái thu | pass |
+| 3 | Workbook Q1 thực tế được đối chiếu | Báo rõ sheet/cột thừa, thiếu, đổi tên hoặc không tương thích; không ghi đè file FIN | pass |
+
+## [2026-07-24 10:35] -- [AUTO] Chẩn đoán lệch số FIN Q1
+
+- [x] Đối chiếu `COM Waterfall - Khấu trừ` với số vàng `KQ Sale. (7)!AB` theo từng Mã NV.
+- [x] Xác định proxy sai: đếm mọi KH Mức 3 thay vì danh sách KH mới đủ điều kiện của FIN.
+- [x] Xác minh `KQ Sale. (7)` lưu sẵn `Mức đạt` theo từng người; đây là nguồn FIN thực sự dùng cho điều chỉnh +/-1%.
+- [x] Thay proxy đếm Mức 3 bằng cột FIN nhập `KH mới đạt` ở Nhân sự; không suy diễn eligibility từ job.
+- [x] Tắt khấu trừ thuế Q1 mặc định để cột Thực nhận so được trực tiếp với `Tổng Incentive` FIN trước thuế.
+- [x] Cập nhật file mẫu và workbook Q1 hiện tại bằng các giá trị `Mức đạt` đã có trong số vàng, rồi chạy đối soát 7/7.
+
+## Test Plan -- Khớp số vàng FIN Q1
+
+| # | Scenario | Expected | Status |
+|---|---|---|---|
+| 1 | KH mới đạt được FIN nhập trực tiếp | Điều chỉnh +/-1% dùng đúng `Mức đạt - Mức giao`, không đếm mọi Mức 3 | pass |
+| 2 | Preset Q1 | Không trừ thuế 10% mặc định khi đối soát `Tổng Incentive` FIN | pass |
+| 3 | 2026Q1-Incentive-Table | `Thực nhận` của 7 người bằng `KQ Sale. (7)!AB` tới đồng | pass |
+
+## [2026-07-24 11:10] -- [AUTO] Khôi phục thực nhận sau thuế Q1
+
+- [x] Bật lại recipe thuế Q1 để `Thực nhận` trừ thuế incentive.
+- [x] Đổi regression: `COM Waterfall - Khấu trừ` khớp FIN AB, còn `Thực nhận` là số sau thuế.
+- [x] Giữ sheet Quy tắc phạt với header/rule schema nhưng để rỗng cho default 1%; chạy Node + browser QA.
+
+## Test Plan -- Thực nhận sau thuế Q1
+
+| # | Scenario | Expected | Status |
+|---|---|---|---|
+| 1 | Số vàng FIN `KQ Sale. (7)!AB` | Khớp `COM Waterfall - Khấu trừ` theo 7 Mã NV | pass |
+| 2 | Ca mẫu Q1 | 13.907.096 trước thuế, thuế 1.390.710, thực nhận 12.516.386 | pass |
+| 3 | Sheet `Quy tắc phạt` trống dòng rule | Schema vẫn khớp, áp 1% mặc định, browser import/calculate pass | pass |
+
 ## [2026-07-21 09:12] -- [AUTO] Prepare Claude review prompt
 
 - [x] Create a copy-ready Claude/Cowork review prompt under `handoff/`

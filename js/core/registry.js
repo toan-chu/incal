@@ -9,9 +9,11 @@
     block('source', 'Lấy nguồn', 'Nguồn', [], T.TABLE, [cfg('table', 'Bảng', 'select', ['jobs', 'roster']), cfg('ownerFieldId', 'Khoá người (tuỳ chọn)', 'field')], executeSource),
     block('filter', 'Lọc điều kiện', 'Dữ liệu', [port('table', T.TABLE)], T.TABLE, [cfg('fieldId', 'Cột', 'field'), cfg('operator', 'Điều kiện', 'select', ['eq', 'neq', 'gt', 'gte', 'lt', 'lte', 'contains', 'in']), cfg('value', 'Giá trị', 'text')], executeFilter),
     block('scan_sum', 'Quét + Tổng', 'Dữ liệu', [port('table', T.TABLE)], T.MONEY, [cfg('fieldId', 'Cột tiền', 'field')], executeSum),
+    block('count_distinct', 'Đếm giá trị khác nhau', 'Dữ liệu', [port('table', T.TABLE)], T.NUMBER, [cfg('fieldId', 'Cột cần đếm', 'field')], executeCountDistinct),
     block('lookup', 'Tra bảng + fallback', 'Dữ liệu', [port('key', T.ANY)], function (node) { return node.config?.returnType || T.ANY; }, [cfg('table', 'Bảng tra', 'select', ['jobs', 'roster']), cfg('lookupFieldId', 'Cột khoá', 'field'), cfg('returnFieldId', 'Cột trả về', 'field'), cfg('returnType', 'Kiểu trả về', 'select', Object.values(T)), cfg('fallback', 'Fallback', 'text')], executeLookup),
     block('map_lookup', 'Gắn cột tra cứu', 'Dữ liệu', [port('table', T.TABLE)], T.TABLE, [cfg('sourceKeyFieldId', 'Cột khoá nguồn', 'field'), cfg('table', 'Bảng tra', 'select', ['jobs', 'roster']), cfg('lookupFieldId', 'Cột khoá bảng tra', 'field'), cfg('returnFieldId', 'Cột trả về', 'field'), cfg('returnType', 'Kiểu cột mới', 'select', Object.values(T)), cfg('derivedFieldId', 'Mã cột mới', 'internal'), cfg('derivedFieldLabel', 'Tên cột mới', 'text'), cfg('fallback', 'Nếu không tìm thấy', 'text')], executeMapLookup),
     block('map_arithmetic', 'Tính cột', 'Dữ liệu', [port('table', T.TABLE)], T.TABLE, [cfg('leftMode', 'Toán hạng 1', 'select', ['field', 'literal']), cfg('leftFieldId', 'Cột 1', 'field'), cfg('leftLiteral', 'Hằng số 1', 'text'), cfg('leftLiteralType', 'Kiểu hằng số 1', 'select', [T.MONEY, T.NUMBER, T.PERCENT]), cfg('operator', 'Phép tính', 'select', ['+', '-', '*', '/']), cfg('rightMode', 'Toán hạng 2', 'select', ['field', 'literal']), cfg('rightFieldId', 'Cột 2', 'field'), cfg('rightLiteral', 'Hằng số 2', 'text'), cfg('rightLiteralType', 'Kiểu hằng số 2', 'select', [T.MONEY, T.NUMBER, T.PERCENT]), cfg('derivedFieldId', 'Mã cột mới', 'internal'), cfg('derivedFieldLabel', 'Tên cột mới', 'text')], executeMapArithmetic),
+    block('map_rule_rate', 'Áp tỷ lệ theo quy tắc', 'Dữ liệu', [port('table', T.TABLE)], T.TABLE, [cfg('table', 'Bảng quy tắc', 'select', ['jobs', 'roster']), cfg('sourceJobFieldId', 'Job nguồn', 'field'), cfg('sourceTeamFieldId', 'Team nguồn', 'field'), cfg('sourceFactorFieldId', 'Nhân tố nguồn', 'field'), cfg('sourceMonthsFieldId', 'Số tháng nguồn', 'field'), cfg('rulePriorityFieldId', 'Ưu tiên', 'field'), cfg('ruleJobFieldId', 'Job trong quy tắc', 'field'), cfg('ruleTeamFieldId', 'Team trong quy tắc', 'field'), cfg('ruleFactorFieldId', 'Nhân tố trong quy tắc', 'field'), cfg('ruleMinMonthsFieldId', 'Từ tháng', 'field'), cfg('ruleMaxMonthsFieldId', 'Đến tháng', 'field'), cfg('ruleRateFieldId', 'Tỷ lệ trong quy tắc', 'field'), cfg('defaultRate', 'Tỷ lệ mặc định', 'number'), cfg('derivedFieldId', 'Mã cột mới', 'internal'), cfg('derivedFieldLabel', 'Tên cột mới', 'text')], executeMapRuleRate),
     block('arithmetic', '+ − × ÷', 'Tính toán', [port('left', T.ANY), port('right', T.ANY)], arithmeticOutputType, [cfg('operator', 'Phép toán', 'select', ['+', '-', '*', '/'])], executeArithmetic),
     block('percent_of', '% của', 'Tính toán', [port('base', T.MONEY), port('rate', T.PERCENT)], T.MONEY, [], function (i) { return result(i.base * i.rate); }),
     block('condition', 'Điều kiện', 'Logic', [port('condition', T.BOOLEAN), port('whenTrue', T.ANY), port('whenFalse', T.ANY)], function (node, inputTypes) { return inputTypes.whenTrue || node.outputType || T.ANY; }, [], function (i) { return result(i.condition ? i.whenTrue : i.whenFalse); }),
@@ -55,6 +57,7 @@
       if (left === T.MONEY && right === T.NUMBER) return T.MONEY;
       if (left === T.NUMBER && right === T.MONEY) return T.MONEY;
       if (left === T.NUMBER && right === T.NUMBER) return T.NUMBER;
+      if ((left === T.NUMBER && right === T.PERCENT) || (left === T.PERCENT && right === T.NUMBER)) return T.PERCENT;
     }
     if (op === '/') {
       if (left === T.MONEY && right === T.NUMBER) return T.MONEY;
@@ -82,6 +85,12 @@
   function executeSum(inputs, config) {
     const rows = Array.isArray(inputs.table) ? inputs.table : [];
     return result(rows.reduce((sum, row) => sum + number(read(row, config.fieldId)), 0), rows);
+  }
+
+  function executeCountDistinct(inputs, config) {
+    const rows = Array.isArray(inputs.table) ? inputs.table : [];
+    const values = new Set(rows.map((row) => normalized(read(row, config.fieldId))).filter(Boolean));
+    return result(values.size, rows, { rowCount: rows.length, distinctCount: values.size, fieldId: config.fieldId });
   }
 
   function executeLookup(inputs, config, context) {
@@ -123,6 +132,49 @@
       return Object.assign({}, row, { [derivedFieldId]: value });
     });
     return result(rows, rows, { rowCount: rows.length, invalidCount, derivedFieldId, operator: config.operator || '+' });
+  }
+
+  function executeMapRuleRate(inputs, config, context) {
+    const sourceRows = Array.isArray(inputs.table) ? inputs.table : [];
+    const ruleRows = context.tables?.[config.table] || [];
+    const derivedFieldId = String(config.derivedFieldId || 'derived.rule-rate').trim() || 'derived.rule-rate';
+    const defaultRate = number(config.defaultRate);
+    const rules = ruleRows.map((row, index) => ({ row, index, priority: rulePriority(row, config) }));
+    let matchedCount = 0;
+    let defaultCount = 0;
+    const appliedRuleRows = [];
+    const rows = sourceRows.map((row) => {
+      const winner = rules.filter((rule) => ruleMatches(row, rule.row, config)).sort((left, right) => left.priority - right.priority || left.index - right.index)[0];
+      const rate = winner ? number(read(winner.row, config.ruleRateFieldId)) : defaultRate;
+      if (winner) {
+        matchedCount += 1;
+        appliedRuleRows.push(winner.index + 2);
+      } else defaultCount += 1;
+      return Object.assign({}, row, { [derivedFieldId]: rate });
+    });
+    return result(rows, rows, { rowCount: rows.length, matchedCount, defaultCount, appliedRuleRows, derivedFieldId });
+  }
+
+  function ruleMatches(source, rule, config) {
+    if (!matchesTextRule(read(source, config.sourceJobFieldId), read(rule, config.ruleJobFieldId))) return false;
+    if (!matchesTextRule(read(source, config.sourceTeamFieldId), read(rule, config.ruleTeamFieldId))) return false;
+    if (!matchesTextRule(read(source, config.sourceFactorFieldId), read(rule, config.ruleFactorFieldId))) return false;
+    const months = optionalNumber(read(source, config.sourceMonthsFieldId));
+    const min = optionalNumber(read(rule, config.ruleMinMonthsFieldId));
+    const max = optionalNumber(read(rule, config.ruleMaxMonthsFieldId));
+    if (min !== null && (months === null || months < min)) return false;
+    if (max !== null && (months === null || months > max)) return false;
+    return true;
+  }
+
+  function matchesTextRule(source, expected) {
+    if (!normalized(expected)) return true;
+    return normalized(source) === normalized(expected);
+  }
+
+  function rulePriority(row, config) {
+    const value = optionalNumber(read(row, config.rulePriorityFieldId));
+    return value === null ? Number.MAX_SAFE_INTEGER : value;
   }
 
   function mapOperandValue(row, config, side) {
@@ -241,6 +293,11 @@
   }
   function round(value) { const n = Number(value || 0); return Number.isFinite(n) ? Math.round(n) : NaN; }
   function number(value) { const n = Number(value || 0); return Number.isFinite(n) ? n : 0; }
+  function optionalNumber(value) {
+    if (value === null || value === undefined || value === '') return null;
+    const numeric = Number(value);
+    return Number.isFinite(numeric) ? numeric : null;
+  }
   function normalized(value) { return String(value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase(); }
   function read(row, fieldId) { return row?.[fieldId] ?? row?.[String(fieldId || '').split('.').pop()]; }
   function compare(left, right, operator) {

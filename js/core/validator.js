@@ -42,6 +42,7 @@
       }
       validateConfig(node, definition, fieldLookup, errors);
       if (node.blockId === 'map_arithmetic') validateMapArithmetic(node, fieldLookup, errors, definition.name);
+      if (node.blockId === 'map_rule_rate') validateMapRuleRate(node, fieldLookup, errors, definition.name);
       if (node.blockId === 'arithmetic' && node.config?.operator === '/' && isZeroLiteral(node.inputs?.right)) {
         add(errors, issue('DIVIDE_BY_ZERO', node.id, 'right', `${definition.name}: không được chia cho 0.`));
       }
@@ -133,7 +134,7 @@
       if (node.blockId === 'map_arithmetic' && spec.kind === 'field' && node.config?.[spec.id.startsWith('left') ? 'leftMode' : 'rightMode'] === 'literal') continue;
       const value = node.config?.[spec.id];
       if (spec.kind === 'field' && value && !fields.has(value)) add(errors, issue('UNKNOWN_FIELD', node.id, spec.id, `${definition.name}: field "${value}" không tồn tại.`));
-      if (spec.kind === 'select' && spec.id === 'table' && ['source', 'lookup', 'map_lookup'].includes(node.blockId)) {
+      if (spec.kind === 'select' && spec.id === 'table' && ['source', 'lookup', 'map_lookup', 'map_rule_rate'].includes(node.blockId)) {
         const tableIds = new Set(Array.from(fields.values()).map((field) => field.table));
         if (value && !tableIds.has(value)) add(errors, issue('BAD_CONFIG', node.id, spec.id, `${definition.name}: bảng "${value}" không tồn tại trong workbook.`));
       } else if (spec.kind === 'select' && value && spec.options?.length && !spec.options.includes(value)) {
@@ -144,7 +145,7 @@
 
   function registerDerivedFields(nodes, fields, errors) {
     const owners = new Map();
-    const derivedNodes = nodes.filter((node) => ['map_lookup', 'map_arithmetic'].includes(node.blockId));
+    const derivedNodes = nodes.filter((node) => ['map_lookup', 'map_arithmetic', 'map_rule_rate'].includes(node.blockId));
     for (const node of derivedNodes) {
       const id = derivedFieldId(node);
       const existingOwner = owners.get(id);
@@ -156,6 +157,10 @@
       const id = derivedFieldId(node);
       if (owners.get(id) !== node.id) continue;
       fields.set(id, derivedField(node, node.config?.returnType || T.ANY, 'Cột tra cứu'));
+    }
+    for (const node of derivedNodes.filter((item) => item.blockId === 'map_rule_rate')) {
+      const id = derivedFieldId(node);
+      if (owners.get(id) === node.id) fields.set(id, derivedField(node, T.PERCENT, 'Tỷ lệ theo quy tắc'));
     }
     let pending = derivedNodes.filter((item) => item.blockId === 'map_arithmetic' && owners.get(derivedFieldId(item)) === item.id);
     do {
@@ -191,6 +196,41 @@
     if (node.config?.operator === '/' && node.config?.rightMode === 'literal' && Number(node.config?.rightLiteral) === 0) {
       add(errors, issue('DIVIDE_BY_ZERO', node.id, 'rightLiteral', `${blockName}: không được chia cho 0.`));
     }
+  }
+
+  function validateMapRuleRate(node, fields, errors, blockName) {
+    const config = node.config || {};
+    if (!config.table) add(errors, issue('BAD_CONFIG', node.id, 'table', `${blockName}: chưa chọn bảng quy tắc.`));
+    if (!config.ruleRateFieldId) add(errors, issue('BAD_CONFIG', node.id, 'ruleRateFieldId', `${blockName}: chưa chọn cột tỷ lệ.`));
+    const defaultRate = Number(config.defaultRate);
+    if (!Number.isFinite(defaultRate) || defaultRate < 0 || defaultRate > 1) add(errors, issue('BAD_CONFIG', node.id, 'defaultRate', `${blockName}: tỷ lệ mặc định phải từ 0 đến 1 (ví dụ 0.01).`));
+    validateRuleFieldPair(node, fields, errors, 'sourceJobFieldId', 'ruleJobFieldId', T.TEXT, blockName);
+    validateRuleFieldPair(node, fields, errors, 'sourceTeamFieldId', 'ruleTeamFieldId', T.TEXT, blockName);
+    validateRuleFieldPair(node, fields, errors, 'sourceFactorFieldId', 'ruleFactorFieldId', T.TEXT, blockName);
+    const ruleTable = config.table;
+    for (const fieldId of ['rulePriorityFieldId', 'ruleMinMonthsFieldId', 'ruleMaxMonthsFieldId']) {
+      const field = fields.get(config[fieldId]);
+      if (config[fieldId] && field && field.type !== T.NUMBER) add(errors, issue('TYPE_MISMATCH', node.id, fieldId, `${blockName}: ${field.label} phải là Number.`));
+      if (config[fieldId] && field && field.table !== ruleTable) add(errors, issue('BAD_CONFIG', node.id, fieldId, `${blockName}: ${field.label} phải thuộc bảng quy tắc.`));
+    }
+    const rate = fields.get(config.ruleRateFieldId);
+    if (rate && rate.type !== T.PERCENT) add(errors, issue('TYPE_MISMATCH', node.id, 'ruleRateFieldId', `${blockName}: cột tỷ lệ phải có kiểu Percent.`));
+    if (rate && rate.table !== ruleTable) add(errors, issue('BAD_CONFIG', node.id, 'ruleRateFieldId', `${blockName}: cột tỷ lệ phải thuộc bảng quy tắc.`));
+    const months = fields.get(config.sourceMonthsFieldId);
+    if ((config.ruleMinMonthsFieldId || config.ruleMaxMonthsFieldId) && !config.sourceMonthsFieldId) add(errors, issue('BAD_CONFIG', node.id, 'sourceMonthsFieldId', `${blockName}: phải chọn số tháng nguồn khi dùng khoảng tháng.`));
+    if (config.sourceMonthsFieldId && months && months.type !== T.NUMBER) add(errors, issue('TYPE_MISMATCH', node.id, 'sourceMonthsFieldId', `${blockName}: số tháng nguồn phải có kiểu Number.`));
+  }
+
+  function validateRuleFieldPair(node, fields, errors, sourceId, ruleId, expectedType, blockName) {
+    const source = node.config?.[sourceId];
+    const rule = node.config?.[ruleId];
+    if (Boolean(source) !== Boolean(rule)) add(errors, issue('BAD_CONFIG', node.id, source || rule ? (source ? ruleId : sourceId) : sourceId, `${blockName}: điều kiện nguồn và điều kiện quy tắc phải được chọn cùng nhau.`));
+    for (const fieldId of [sourceId, ruleId]) {
+      const field = fields.get(node.config?.[fieldId]);
+      if (node.config?.[fieldId] && field && field.type !== expectedType) add(errors, issue('TYPE_MISMATCH', node.id, fieldId, `${blockName}: ${field.label} phải có kiểu ${expectedType}.`));
+    }
+    const ruleField = fields.get(rule);
+    if (rule && ruleField && ruleField.table !== node.config?.table) add(errors, issue('BAD_CONFIG', node.id, ruleId, `${blockName}: ${ruleField.label} phải thuộc bảng quy tắc.`));
   }
 
   function mapArithmeticOperandType(node, side, fields) {

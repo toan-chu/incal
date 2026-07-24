@@ -186,7 +186,47 @@
     assertUniqueSubject(roster, subject);
     const transaction = (sourceSchema.sheets || []).find((table) => normalize(table.role) === 'giao dich' || /job|transaction|sales/.test(normalize(table.name)));
     const jobs = transaction ? tables[transaction.tableId] || [] : [];
-    return { roster, jobs, tables, fields: allFields, subjectTableId: subject.tableId, subjectLabel: subject.label };
+    const input = { roster, jobs, tables, fields: allFields, subjectTableId: subject.tableId, subjectLabel: subject.label };
+    input.warnings = validateBusinessData(sourceSchema, tables);
+    return input;
+  }
+
+  function validateBusinessData(sourceSchema, tables) {
+    const warnings = [];
+    const fieldId = (sheetName, header) => sourceSchema.sheets?.find((sheet) => sheet.name === sheetName)?.fields?.find((field) => normalize(field.header) === normalize(header))?.id || '';
+    const jobsSheet = sourceSchema.sheets?.find((sheet) => /job/.test(normalize(sheet.name)) || normalize(sheet.role) === normalize('Giao dịch'));
+    if (jobsSheet) {
+      const teamId = jobsSheet.fields.find((field) => normalize(field.header) === 'team')?.id;
+      const jobId = jobsSheet.fields.find((field) => ['ma job', 'job id', 'job no'].includes(normalize(field.header)))?.id;
+      if (!teamId) warnings.push(`Jobs: thiếu cột Team; không thể kiểm tra tuyến.`);
+      else {
+        const missing = (tables[jobsSheet.tableId] || []).filter((row) => !text(row[teamId]));
+        if (missing.length) warnings.push(`Jobs: ${missing.length} job thiếu Team${jobId ? ` (${missing.slice(0, 3).map((row) => text(row[jobId])).join(', ')})` : ''}. Hỏi FIN trước khi áp dụng rule theo Team.`);
+      }
+    }
+    const people = sourceSchema.sheets?.find((sheet) => /nhan su|employee|staff|roster/.test(normalize(sheet.name)));
+    if (people) {
+      const targetId = people.fields.find((field) => normalize(field.header) === normalize('Target quý'))?.id;
+      const salaries = ['Lương T1', 'Lương T2', 'Lương T3'].map((header) => fieldId(people.name, header)).filter(Boolean);
+      const employeeId = people.fields.find((field) => ['ma nv', 'ma nhan su', 'employee id', 'staff id'].includes(normalize(field.header)))?.id;
+      const nameId = people.fields.find((field) => ['ho ten', 'ten nhan vien', 'employee name', 'name'].includes(normalize(field.header)))?.id;
+      if (targetId && salaries.length === 3) {
+        for (const row of tables[people.tableId] || []) {
+          const salaryTotal = salaries.reduce((sum, id) => sum + number(row[id]), 0);
+          if (number(row[targetId]) > 0 && number(row[targetId]) < salaryTotal) warnings.push(`Nhân sự ${text(row[employeeId]) || 'không mã'}: Target quý nhỏ hơn tổng lương 3 tháng; kiểm tra lại tháng/quý.`);
+        }
+      }
+      if (jobsSheet && employeeId && nameId) {
+        const jobEmployeeId = jobsSheet.fields.find((field) => ['ma nv', 'ma nhan su', 'employee id', 'staff id'].includes(normalize(field.header)))?.id;
+        const jobNameId = jobsSheet.fields.find((field) => ['nhan vien', 'ho ten', 'ten nhan vien', 'employee name', 'name'].includes(normalize(field.header)))?.id;
+        if (jobEmployeeId && jobNameId) {
+          const peopleNames = new Map((tables[people.tableId] || []).map((row) => [text(row[employeeId]), text(row[nameId])]).filter(([id, name]) => id && name));
+          const mismatches = (tables[jobsSheet.tableId] || []).filter((row) => peopleNames.has(text(row[jobEmployeeId])) && normalize(peopleNames.get(text(row[jobEmployeeId]))) !== normalize(row[jobNameId]));
+          if (mismatches.length) warnings.push(`Jobs/Nhân sự: ${new Set(mismatches.map((row) => text(row[jobEmployeeId]))).size} Mã NV có tên lệch giữa hai sheet.`);
+        }
+      }
+    }
+    return warnings;
   }
 
   function aliasSubject(row, bindings, index) {
@@ -241,6 +281,8 @@
       return String(worksheet?.[address]?.z || '').includes('%');
     });
     if (key.includes('%') || key.includes('phan tram') || key.includes('ty le') || hasPercentFormat) return 'Percent';
+    if (key.includes('nhan to')) return 'Text';
+    if (/(uu tien|tu thang|[dđ]en thang|so thang|chi tieu kh moi|kh moi dat)/.test(key)) return 'Number';
     if (/(gp|gross profit|lai gop|target|chi tieu|luong|doanh thu|chi phi|thue|phat|no qua han|du phong|dieu chinh|tong tru|\bcom\b|tien)/.test(key)) return 'Money';
     if (!values.length) return 'Text';
     if (values.every((value) => value instanceof Date)) return 'Date';
@@ -297,12 +339,13 @@
   }
 
   function text(value) { return String(value ?? '').trim(); }
+  function number(value) { const parsed = Number(value); return Number.isFinite(parsed) ? parsed : 0; }
   function present(value) { return value !== null && value !== undefined && value !== ''; }
   function normalize(value) { return String(value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase(); }
 
   return {
     TYPE_OPTIONS, BINDING_SPECS,
     discoverWorkbook, prepareSourceSchema, reconcileSourceSchema, compareSourceSchema,
-    suggestBindings, validateBindings, materializeWorkbook, fingerprint
+    suggestBindings, validateBindings, materializeWorkbook, validateBusinessData, fingerprint
   };
 });

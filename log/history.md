@@ -1,5 +1,50 @@
 # History
 
+## [2026-07-24 09:33] -- [AUTO] Policy-driven penalty and FIN Q1 template
+
+**Type:** feature
+**Files Changed:** `INPUT-Incentive-mau.xlsx`, `presets/trustana-q1.json`, `README.md`, `js/core/registry.js`, `js/core/validator.js`, `js/adapters/xlsx.js`, `js/app.js`, `scripts/app_browser_runner.js`, `test/v3_core.test.js`
+**Summary:** Added a deterministic policy table for penalty rates with default 1% and Job/Team/factor/month rules, plus a FIN-friendly Q1 template. The Q1 preset now derives the +/-1% new-customer adjustment from distinct Muc 3 customers and the entered target, and warns about missing Team, suspect quarterly target, and name mismatches.
+**Decision:** Kept monetary calculation in existing map-arithmetic blocks and made rate selection a typed registry primitive, so FIN changes policy data rather than manual penalty amounts or arbitrary canvas formulas.
+
+---
+
+## [2026-07-24 11:10] -- [AUTO] Restore Q1 take-home tax treatment
+
+**Type:** bugfix
+**Files Changed:** `presets/trustana-q1.json`, `test/v3_core.test.js`, `scripts/app_browser_runner.js`, `README.md`, `handoff/todo.md`, `handoff/audit.md`, `log/history.md`
+**Summary:** Restored the Q1 tax deduction so `Thực nhận` is genuinely take-home pay. The FIN golden column `KQ Sale. (7)!AB` is now verified against the pre-tax amount `COM Waterfall - Khấu trừ`, while the UI reports tax and then the lower take-home amount.
+**Decision:** Keep the header-only `Quy tắc phạt` sheet in the Q1 workbook. Its empty rows intentionally activate the 1% default; the sheet remains the controlled input for future 2%/3% exceptions.
+
+---
+
+## [2026-07-24 10:10] -- [AUTO] Simplify receipt input and audit Q1 schema
+
+**Type:** config
+**Files Changed:** `INPUT-Incentive-mau.xlsx`, `presets/trustana-q1.json`, `README.md`, `scripts/app_browser_runner.js`, `test/v3_core.test.js`, `handoff/todo.md`, `handoff/audit.md`, `log/history.md`
+**Summary:** Removed the unused `% đã thu` field from the FIN template and Q1 preset fingerprint. FIN now records only `Paid` or `Unpaid`; the Q1 workbook was inspected read-only and has documented missing policy/target/debt columns plus one missing Team route.
+**Decision:** Keep exact schema matching fail-closed. The Q1 data workbook is not modified automatically because missing Team, new-customer targets, and penalty rules are FIN business inputs rather than values Codex can infer.
+
+---
+
+## [2026-07-24 10:35] -- [AUTO] Diagnose Q1 FIN reconciliation gap
+
+**Type:** research
+**Files Changed:** `log/failure.md`, `handoff/audit.md`, `handoff/todo.md`, `log/history.md`
+**Summary:** Compared the actual app output to the FIN gold workbook and found that the Q1 +/-1% adjustment counts all distinct Muc 3 customers, while FIN counts only the curated and contract-eligible new-customer list. Four of five COM payouts therefore differ before tax; the visible net column also subtracts a tax that FIN's AB gold column does not.
+**Decision:** Do not alter payout data or guess eligibility. Replace the proxy with an explicit FIN-owned new-customer eligibility input before attempting another parity run.
+
+---
+
+## [2026-07-24 10:55] -- [AUTO] Reconcile Q1 preset to FIN gold values
+
+**Type:** bugfix
+**Files Changed:** `INPUT-Incentive-mau.xlsx`, `2026Q1-Incentive-Table.xlsx`, `presets/trustana-q1.json`, `js/adapters/xlsx.js`, `README.md`, `scripts/app_browser_runner.js`, `test/v3_core.test.js`, `handoff/todo.md`, `handoff/audit.md`, `log/history.md`, `log/failure.md`
+**Summary:** Replaced the incorrect all-Muc-3 proxy with FIN-entered `KH mới đạt`, disabled the unsupported Q1 default tax deduction, and populated the verified Q1 achievement counts. The app now matches the FIN `Tổng Incentive` gold values for all seven people with zero delta.
+**Decision:** Treat approved new-customer achievement as a period input owned by FIN. Keep the Q1 tax recipe disabled until payroll-backed tax policy is supplied, so the displayed result retains the same pre-tax semantics as FIN's reconciliation column.
+
+---
+
 ## [2026-07-22 15:08] -- [AUTO] Align graph popup and add map lookup primitive
 
 **Type:** feature

@@ -17,6 +17,7 @@
     report: null,
     reports: [],
     runErrors: [],
+    runWarnings: [],
     canvasPan: { x: 0, y: 0 },
     canvasZoom: 1,
     nodeDrag: null,
@@ -584,6 +585,7 @@
     if (node.blockId === 'lookup') return `${displayTable(node.config?.table)} · trả về ${displayFieldOrValue(node.config?.returnFieldId)}`;
     if (node.blockId === 'map_lookup') return `${displayFieldOrValue(node.config?.returnFieldId)} → ${node.config?.derivedFieldLabel || 'Cột tra cứu'}`;
     if (node.blockId === 'map_arithmetic') return `${mapOperandSummary(node, 'left')} ${node.config?.operator || '?'} ${mapOperandSummary(node, 'right')} → ${node.config?.derivedFieldLabel || 'Cột tính toán'}`;
+    if (node.blockId === 'map_rule_rate') return `${displayTable(node.config?.table)} → ${node.config?.derivedFieldLabel || 'Tỷ lệ hiệu lực'} · mặc định ${Number(node.config?.defaultRate || 0) * 100}%`;
     const configs = (def?.configSchema || []).map((item) => node.config?.[item.id]).filter((value) => value !== undefined && value !== '').slice(0, 2);
     return configs.length ? configs.map((value) => Array.isArray(value) ? value.join(' / ') : displayFieldOrValue(value)).join(' · ') : 'Chưa có tham số';
   }
@@ -858,6 +860,26 @@
       output.rightLiteralType = 'Number';
       output.derivedFieldLabel = 'Cột tính toán';
     }
+    if (blockId === 'map_rule_rate') {
+      const ruleTable = currentTables().find((table) => normalizeText(table.name).includes('quy tac phat')) || currentTables().find((table) => table.tableId !== state.sourceSchema?.subjectTableId) || currentTables()[0];
+      const inputTable = currentTables().find((table) => table.tableId !== ruleTable?.tableId) || currentTables()[0];
+      const inputField = (header) => fieldsForTable(inputTable?.tableId).find((field) => normalizeText(field.header || field.label) === normalizeText(header))?.id || '';
+      const ruleField = (header) => fieldsForTable(ruleTable?.tableId).find((field) => normalizeText(field.header || field.label) === normalizeText(header))?.id || '';
+      output.table = ruleTable?.tableId || '';
+      output.sourceJobFieldId = inputField('Job');
+      output.sourceTeamFieldId = inputField('Team');
+      output.sourceFactorFieldId = inputField('Nhân tố phạt');
+      output.sourceMonthsFieldId = inputField('Số tháng quá hạn');
+      output.rulePriorityFieldId = ruleField('Ưu tiên');
+      output.ruleJobFieldId = ruleField('Job');
+      output.ruleTeamFieldId = ruleField('Team');
+      output.ruleFactorFieldId = ruleField('Nhân tố phạt');
+      output.ruleMinMonthsFieldId = ruleField('Từ tháng quá hạn');
+      output.ruleMaxMonthsFieldId = ruleField('Đến tháng quá hạn');
+      output.ruleRateFieldId = ruleField('Tỷ lệ phạt');
+      output.defaultRate = 0.01;
+      output.derivedFieldLabel = 'Tỷ lệ phạt hiệu lực';
+    }
     return output;
   }
 
@@ -929,7 +951,7 @@
     }
     const value = node.config?.[spec.id];
     let control;
-    if (spec.kind === 'select' && spec.id === 'table' && ['source', 'lookup', 'map_lookup'].includes(node.blockId)) {
+    if (spec.kind === 'select' && spec.id === 'table' && ['source', 'lookup', 'map_lookup', 'map_rule_rate'].includes(node.blockId)) {
       control = `<select data-config="table">${currentTables().map((table) => `<option value="${escapeHtml(table.tableId)}" ${table.tableId === value ? 'selected' : ''}>${escapeHtml(table.label)} · ${escapeHtml(table.role)}</option>`).join('')}</select>`;
     } else if (spec.kind === 'select') control = `<select data-config="${spec.id}">${spec.options.map((option) => `<option value="${escapeHtml(option)}" ${option === value ? 'selected' : ''}>${escapeHtml(displayOperator(option))}</option>`).join('')}</select>`;
     else if (spec.kind === 'field') {
@@ -937,9 +959,13 @@
         ? node.config?.table
         : ['lookup', 'map_lookup'].includes(node.blockId) && ['lookupFieldId', 'returnFieldId'].includes(spec.id)
           ? node.config?.table
-          : node.blockId === 'map_lookup' && spec.id === 'sourceKeyFieldId' ? inputTableId(node) : null;
+          : node.blockId === 'map_lookup' && spec.id === 'sourceKeyFieldId' ? inputTableId(node)
+            : node.blockId === 'map_rule_rate' && spec.id.startsWith('rule') ? node.config?.table
+              : node.blockId === 'map_rule_rate' && spec.id.startsWith('source') ? inputTableId(node) : null;
       const arithmeticField = node.blockId === 'map_arithmetic' && ['leftFieldId', 'rightFieldId'].includes(spec.id);
-      control = `<select data-config="${spec.id}"><option value="">-- không dùng --</option>${sourceOptionGroups(value, arithmeticField ? inputTableId(node) : tableId, arithmeticField ? ['Money', 'Number', 'Percent'] : null, arithmeticField)}</select>`;
+      const policyTypes = policyRateExpectedTypes(spec.id);
+      const policySource = node.blockId === 'map_rule_rate' && spec.id.startsWith('source');
+      control = `<select data-config="${spec.id}"><option value="">-- không dùng --</option>${sourceOptionGroups(value, arithmeticField ? inputTableId(node) : tableId, arithmeticField ? ['Money', 'Number', 'Percent'] : policyTypes, arithmeticField || policySource)}</select>`;
     }
     else {
       const listHint = node.blockId === 'filter' && spec.id === 'value' && node.config?.operator === 'in'
@@ -963,6 +989,13 @@
   function matchesExpectedType(actual, expected) {
     if (!expected || expected === 'Any') return true;
     return Array.isArray(expected) ? expected.includes(actual) : actual === expected;
+  }
+
+  function policyRateExpectedTypes(specId) {
+    if (['sourceMonthsFieldId', 'rulePriorityFieldId', 'ruleMinMonthsFieldId', 'ruleMaxMonthsFieldId'].includes(specId)) return ['Number'];
+    if (specId === 'ruleRateFieldId') return ['Percent'];
+    if (['sourceJobFieldId', 'sourceTeamFieldId', 'sourceFactorFieldId', 'ruleJobFieldId', 'ruleTeamFieldId', 'ruleFactorFieldId'].includes(specId)) return ['Text'];
+    return null;
   }
 
   function onInspectorChange(event) {
@@ -997,9 +1030,10 @@
         node.config.returnFieldId = fieldsForTable(node.config.table).find((field) => field.id !== node.config.lookupFieldId)?.id || node.config.lookupFieldId;
         node.config.returnType = currentFields().find((field) => field.id === node.config.returnFieldId)?.type || 'Any';
       }
+      if (node.blockId === 'map_rule_rate') renderInspector();
       renderInspector();
     }
-    if (['lookup', 'map_lookup'].includes(node.blockId)) V3.syncPresetRelations(state.preset);
+    if (['lookup', 'map_lookup', 'map_rule_rate'].includes(node.blockId)) V3.syncPresetRelations(state.preset);
     if (['lookup', 'map_lookup'].includes(node.blockId) && event.target.dataset.config === 'returnFieldId') {
       node.config.returnType = currentFields().find((field) => field.id === node.config.returnFieldId)?.type || node.config.returnType || 'Any';
       renderInspector();
@@ -1553,6 +1587,7 @@
 
   function validateRun() {
     const errors = [];
+    const warnings = [];
     state.input = null;
     const readiness = formulaReadiness();
     errors.push(...readiness.errors);
@@ -1561,9 +1596,11 @@
       try {
         state.input = V3.materializeWorkbook(state.workbook, state.sourceSchema, state.preset.bindings, XLSX);
         if (!state.input.roster.length) errors.push(`Bảng chủ thể "${state.input.subjectLabel}" không có dòng dữ liệu.`);
+        warnings.push(...(state.input.warnings || []));
       } catch (error) { errors.push(error.message); }
     }
     state.runErrors = Array.from(new Set(errors));
+    state.runWarnings = Array.from(new Set(warnings));
     renderRun();
     return state.runErrors.length === 0;
   }
@@ -1573,7 +1610,7 @@
     setStatus(els.runGate, ready
       ? { kind: 'success', icon: '✓', title: 'Sẵn sàng tính', detail: `${state.input.roster.length} dòng chủ thể "${state.input.subjectLabel}" · ${Object.keys(state.input.tables || {}).length} bảng · schema ${state.compatibility === 'exact' ? 'tự ướm' : 'đã xác nhận'}.` }
       : { kind: state.compatibility === 'mismatch' ? 'danger' : 'neutral', icon: state.compatibility === 'mismatch' ? '!' : '○', title: 'Chưa sẵn sàng', detail: state.runErrors[0] || 'Nạp workbook và hoàn tất preset.' });
-    els.runIssues.innerHTML = state.runErrors.slice(1).map((message) => `<div class="issue">${escapeHtml(message)}</div>`).join('');
+    els.runIssues.innerHTML = state.runErrors.slice(1).map((message) => `<div class="issue">${escapeHtml(message)}</div>`).join('') + state.runWarnings.map((message) => `<div class="issue warning">Cảnh báo: ${escapeHtml(message)}</div>`).join('');
     els.calculateButton.disabled = !ready;
     els.metricQuarter.textContent = els.quarterInput.value;
     els.metricPeople.textContent = state.input?.roster?.length || 0;
@@ -1724,6 +1761,12 @@
         result.push(field);
         lookup.set(field.id, field);
       }
+      for (const node of recipe.nodes || []) {
+        if (node.blockId !== 'map_rule_rate') continue;
+        const field = derivedFieldModel(recipe, node, 'Percent', 'Tỷ lệ theo quy tắc');
+        result.push(field);
+        lookup.set(field.id, field);
+      }
       let pending = (recipe.nodes || []).filter((node) => node.blockId === 'map_arithmetic');
       do {
         const before = pending.length;
@@ -1744,7 +1787,7 @@
   }
   function derivedFieldModel(recipe, node, type, fallbackLabel) { return { id: node.config?.derivedFieldId || derivedFieldIdForNode(node.id), label: node.config?.derivedFieldLabel || fallbackLabel, type, table: `derived:${recipe.id}`, derived: true, sourceNodeId: node.id }; }
   function mapArithmeticOperandType(node, side, fields) { return node.config?.[`${side}Mode`] === 'literal' ? node.config?.[`${side}LiteralType`] || 'Number' : fields.get(node.config?.[`${side}FieldId`])?.type || null; }
-  function isDerivedBlock(node) { return ['map_lookup', 'map_arithmetic'].includes(node?.blockId); }
+  function isDerivedBlock(node) { return ['map_lookup', 'map_arithmetic', 'map_rule_rate'].includes(node?.blockId); }
   function derivedFieldIdForNode(nodeId) { return `derived:${String(nodeId || 'lookup')}`; }
   function inputTableId(node, seen) {
     const visited = seen || new Set();

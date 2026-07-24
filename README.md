@@ -5,7 +5,7 @@
 ![HTML5](https://img.shields.io/badge/HTML5-file%3A%2F%2F-E34F26?logo=html5&logoColor=white)
 ![SheetJS](https://img.shields.io/badge/Excel-SheetJS-217346?logo=microsoftexcel&logoColor=white)
 ![Offline](https://img.shields.io/badge/Offline-No%20network-1D9E75)
-![Tests](https://img.shields.io/badge/tests-42%2F42%20passing-2ea44f)
+![Tests](https://img.shields.io/badge/tests-44%2F44%20passing-2ea44f)
 ![No dependencies](https://img.shields.io/badge/dependencies-0-lightgrey)
 
 > Công cụ tính incentive offline dành cho Finance: nạp Excel, kiểm soát công thức bằng sơ đồ, đối soát từng khoản và xuất báo cáo.
@@ -67,6 +67,20 @@ Preset là “bản thiết kế tính” gồm schema, ánh xạ, recipe, node 
 - **Lưu preset**: tải JSON về máy để backup hoặc chia sẻ.
 - Nếu workbook lệch sheet/header so với preset, nút tính bị khóa để tránh chạy nhầm dữ liệu.
 
+## 🧾 Dành cho FIN: preset Q1 và file mẫu
+
+Luồng giao nhận là: **dùng file mẫu mới → FIN điền dữ liệu → nạp `trustana-q1.json` → bấm Tính**. Không đổi tên sheet hoặc header, vì preset sẽ khóa tính khi cấu trúc lệch.
+
+- **Nhân sự / Chỉ tiêu KH mới, KH mới đạt**: FIN nhập số khách mới được giao và số **đạt** đã được FIN duyệt theo danh sách hợp đồng/6 tháng. App tính điều chỉnh `1% × (đạt - giao)` cho Mức 2/Mức 3; không tự coi mọi khách Mức 3 là đạt KPI.
+- **Jobs / Team**: chỉ dùng một trong bốn tuyến `General`, `New`, `KAE Admin`, `KAE Sale`. Ô Team trống được cảnh báo; phải hỏi FIN trước khi dùng rule theo Team.
+- **Jobs / Trạng thái thu**: chỉ nhập `Paid` hoặc `Unpaid`. Không còn cột `% đã thu`; preset Q1 luôn dựa trên trạng thái thu nhị phân.
+- **Công nợ chi tiết / Team, Nhân tố phạt**: là điều kiện tùy chọn cho chính sách phạt. Vẫn có thể tính mức mặc định khi để trống.
+- **Quy tắc phạt**: FIN thay các dòng ví dụ bằng rule của kỳ. `Ưu tiên = 1` là cao nhất; Job, Team, Nhân tố phạt, Từ/Đến tháng để trống nghĩa là áp dụng cho mọi giá trị. Không khớp rule nào thì app dùng **1%**. Công thức tiền phạt luôn là `Doanh thu sau thuế × Số tháng quá hạn × Tỷ lệ phạt hiệu lực`.
+
+Preset Q1 hiện là phạm vi **COM** để test/đối soát trước. Mốc đối chiếu với `Tổng Incentive` FIN là **trước thuế**: `COM Waterfall - Khấu trừ`. `Thực nhận` là số sau khi trừ thêm `Thuế incentive`. Sheet `Quy tắc phạt` vẫn bắt buộc phải giữ để đúng schema: để trống toàn bộ dòng rule nghĩa là dùng **1% mặc định** cho cả kỳ; chỉ nhập rule khi cần ngoại lệ 2%/3% theo Job, Team hoặc nhân tố. Không dùng nó cho BO hoặc KAE pool cho đến khi có recipe riêng và số vàng FIN tương ứng.
+
+Trước khi tính, app cảnh báo ba lỗi nhập tay thường gặp: Team bị trống, Target quý thấp hơn tổng ba tháng lương, hoặc cùng Mã NV nhưng tên khác nhau giữa Jobs và Nhân sự. Cảnh báo không tự sửa dữ liệu.
+
 ## 🔒 Offline và riêng tư
 
 - 🌐 Không CDN, không `fetch`, không gửi dữ liệu ra mạng.
@@ -95,4 +109,4 @@ npm.cmd run qa
 node --test
 ```
 
-Kỳ vọng chính của preset mẫu: **Phạt 2.676.672 VND**, **NET 12.516.386 VND**, **lệch 0**.
+Kỳ vọng chính của preset mẫu: **Phạt 2.676.672 VND**, **NET 12.516.386 VND**, **lệch 0**. Hiện có **44** regression tests.

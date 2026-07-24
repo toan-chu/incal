@@ -22,6 +22,30 @@
 
 ---
 
+## [2026-07-24 11:10] -- [AUTO] Khôi phục thực nhận sau thuế Q1 -- REPORT
+
+**Done:** Bật lại recipe thuế Q1. `Thực nhận` hiện là số sau thuế incentive; số vàng FIN `KQ Sale. (7)!AB` được đối chiếu đúng ngữ nghĩa tại `COM Waterfall - Khấu trừ`. Giữ sheet `Quy tắc phạt` trong schema và workbook Q1 với hàng header nhưng không có dòng rule: đó là chính sách 1% mặc định cho cả kỳ, không phải sheet thừa.
+
+**Files changed:** `presets/trustana-q1.json`, `test/v3_core.test.js`, `scripts/app_browser_runner.js`, `README.md`, `handoff/todo.md`, `handoff/audit.md`, `log/history.md`.
+
+**Verification:**
+
+```text
+npm.cmd test
+=> tests 44; pass 44; fail 0
+=> Q1 gold test: COM Waterfall - Khấu trừ khớp KQ Sale. (7)!AB cho 7 Mã NV
+
+npm.cmd run qa
+=> status pass; file://; sheets 5; fields 35; blocks 21
+=> sample Thực nhận 12,516,386; console/page/network/overflow = 0
+```
+
+**Open questions for Cowork:** Thuế Q1 đang dùng rate 10% từ recipe hiện hữu. Nếu payroll áp biểu thuế khác, FIN cần cung cấp rule thuế được duyệt; không dùng số `Tổng Incentive` trước thuế để thay cho thực nhận.
+
+**Risks/known gaps:** Scope vẫn chỉ COM. Khi có ngoại lệ phạt 2%/3%, FIN nhập dòng có điều kiện vào `Quy tắc phạt`; để trống sheet tiếp tục áp 1% mặc định.
+
+---
+
 ## [2026-07-22 15:08] -- Claude update + popup alignment polish -- REPORT
 
 **Done:** Thay toàn bộ glyph popup bằng 5 SVG line icon cùng hệ 18px/1.7 stroke trong well 28px; icon, text, divider và danger state đã căn theo một grid. Popup node/edge dùng một hàm đặt vị trí, clamp dưới sticky topbar và trong viewport/canvas. `Fit` có ngưỡng thu nhỏ riêng 38% để graph rộng không cắt node đầu/cuối, còn zoom tay vẫn giữ clamp 50%-160%. Bổ sung primitive duy nhất `map_lookup` (`Gắn cột tra cứu`) theo acceptance Claude: nhận `Table`, index bảng tra theo khoá, clone từng row, gắn cột phái sinh có type/label/fallback, không mutate workbook row. Derived field được validator và downstream field picker nhận biết; id nội bộ bị ẩn khỏi finance UI và được regenerate khi duplicate node. Library hiện 15 primitive + 3 macro.
@@ -1423,5 +1447,125 @@ Visual QA inspected `formula-settings-dialog-1440x900.png` and `formulas-1280x80
 **Open questions for Cowork:** Không.
 
 **Risks/known gaps:** Empty list intentionally matches nothing. Separator characters inside a literal list item are not supported, consistent with the delegated plain-text syntax. No engine, rounding, other block executor, macro or preset logic changed.
+
+---
+
+## [2026-07-24 09:33] -- [AUTO] Tỷ lệ phạt theo chính sách và template FIN -- PLAN
+
+**Decision:** Dùng primitive registry `Áp tỷ lệ theo quy tắc` (`Table -> Table`) thay vì một cột số tiền Phạt. Primitive tạo `Tỷ lệ phạt hiệu lực` kiểu Percent, còn hai block `Tính cột` hiện hữu tiếp tục tính số tiền từ doanh thu, tháng quá hạn và tỷ lệ đó. Engine, rounding và macro không thay đổi.
+
+**Policy contract:** Sheet `Quy tắc phạt` có các cột Ưu tiên (1 cao nhất), Job, Team, Nhân tố phạt, Từ tháng quá hạn, Đến tháng quá hạn, Tỷ lệ phạt và Ghi chú. Ô điều kiện để trống nghĩa là khớp mọi giá trị; nhiều rule cùng khớp chọn Ưu tiên nhỏ hơn, rồi dòng Excel xuất hiện trước. Không có rule khớp dùng 1% mặc định. Job có Team trống không bị chặn hoặc suy diễn Team; nó chỉ không thể khớp rule yêu cầu Team.
+
+**Alternatives considered:** (1) FIN điền sẵn số tiền phạt: dễ lệch và dễ cộng trùng; loại. (2) hardcode các nhánh 1/2/3% trong canvas: khó kiểm toán/mở rộng; loại. (3) một generic rate-policy primitive có rule table versionable: giữ preset kiểm soát được, FIN sửa tỷ lệ bằng Excel và lưu preset; chọn.
+
+**Verification gates:** Unit tests cho fallback/rule/priority/wildcard/immutability/config sai; sample Q1 giữ Phạt 2.676.672 và NET 12.516.386; full Node + browser QA; inspect/render workbook mới; không sửa hai workbook FIN thật.
+
+---
+
+## [2026-07-24 09:33] -- [AUTO] Tỷ lệ phạt theo chính sách và template FIN -- REPORT
+
+**Done:** Thêm `Áp tỷ lệ theo quy tắc` (`Table -> Table`): rule Job/Team/Nhân tố/khoảng tháng, `Ưu tiên` nhỏ hơn thắng rồi đến thứ tự dòng Excel, fallback 1%. Thêm `Đếm giá trị khác nhau` và wiring Q1 cho `1% × (KH Mức 3 đạt - Chỉ tiêu KH mới)` vào Waterfall ở cả COM và Thuế. Không sửa `engine.js` hoặc rounding.
+
+**Files changed:** `INPUT-Incentive-mau.xlsx`, `presets/trustana-q1.json`, `README.md`, `css/app.css`, `js/adapters/xlsx.js`, `js/app.js`, `js/core/registry.js`, `js/core/schema.js`, `js/core/validator.js`, `scripts/app_browser_runner.js`, `test/v3_core.test.js`, `handoff/todo.md`, `handoff/audit.md`, `log/history.md`.
+
+**Verification:** `node --test` => 45 pass, 0 fail. `npm.cmd run qa` => file://, 5 sheets, 35 fields, 21 blocks, NET `12.516.386`, console/page/network/overflow = 0. Workbook inspect/render: 5 readable sheets; Nhân sự has `Chỉ tiêu KH mới`; Công nợ has `Team`/`Nhân tố phạt`; Quy tắc phạt has examples 2%/3%. Direct materialize -> runPreset: validation true, Phạt `2.676.672`, NET `12.516.386`. `engine.js` SHA-256 remains `B60CC43D997560CB74746ED0FA79B98705EFF3907225DBF982261CF0068AE090`.
+
+**Open questions for Cowork:** Không. BO/KAE pool vẫn ngoài scope preset Q1; README ghi rõ.
+
+**Risks/known gaps:** `Điều chỉnh %` lịch sử vẫn còn trong file mẫu để giữ schema cũ nhưng preset Q1 đã dùng khối tự tính từ `Chỉ tiêu KH mới`. Rule mẫu 2%/3% không khớp dữ liệu demo; FIN phải thay/xóa chúng trước kỳ thực. Cảnh báo dữ liệu không tự sửa Team/Target/tên; riêng `EXSANA26010130` vẫn phải FIN xác nhận Team.
+
+---
+
+## [2026-07-24 10:10] -- [AUTO] Rút gọn trạng thái thu và đối chiếu Q1 -- REPORT
+
+**Done:** Loại `% đã thu` khỏi `INPUT-Incentive-mau.xlsx`, source fingerprint của preset Q1, browser QA và regression assertion. File mẫu nay có 34 trường/5 sheet; Jobs chỉ dùng `Trạng thái thu` với `Paid` hoặc `Unpaid`. README nêu rõ hợp đồng nhập liệu này. Đối chiếu `2026Q1-Incentive-Table.xlsx` ở chế độ chỉ đọc; không ghi đè workbook FIN.
+
+**Files changed:** `INPUT-Incentive-mau.xlsx`, `presets/trustana-q1.json`, `README.md`, `scripts/app_browser_runner.js`, `test/v3_core.test.js`, `handoff/todo.md`, `handoff/audit.md`, `log/history.md`.
+
+**Verification:**
+
+```text
+npm.cmd test
+=> tests 43; pass 43; fail 0
+
+npm.cmd run qa
+=> status pass; file://; sheets 5; fields 34; blocks 21
+=> Q1 NET 12,516,386; console/page/network/overflow = 0
+
+Sample import + preset comparison
+=> fingerprint FNV1A-c24900c0-39; matchesPreset true; warnings []
+
+2026Q1-Incentive-Table read-only comparison
+=> actual fingerprint FNV1A-2406c58d-26; exact false
+=> missing sheet: Quy tắc phạt
+=> missing Nhân sự columns: Điều chỉnh %, Chỉ tiêu KH mới
+=> missing Công nợ chi tiết columns: Team, Nhân tố phạt
+=> one missing Jobs Team: EXSANA26010130
+=> receipt statuses: Paid, paid, unpaid; all accepted after normalization
+=> no real workbook write performed
+```
+
+**Open questions for Cowork:** FIN cần điền `Chỉ tiêu KH mới` cho 7 nhân sự, xác nhận Team của `EXSANA26010130`, và thêm sheet/cột phạt trước khi nạp preset. `Điều chỉnh %` là cột lịch sử, Q1 hiện không đọc; vẫn còn trong template/preset chỉ để giữ hợp đồng kế thừa.
+
+**Risks/known gaps:** `2026Q1-Incentive-Table.xlsx` chưa thể nạp thẳng Q1 preset vì exact fingerprint fail-closed là chủ đích. Không suy diễn hoặc tự điền Team/rule/target cho FIN.
+
+---
+
+## [2026-07-24 10:35] -- [AUTO] Chẩn đoán lệch số FIN Q1 -- REPORT
+
+**Done:** Đối chiếu trực tiếp output preset hiện hành với cột `KQ Sale. (7)!AB` của workbook FIN. Xác nhận 4/5 người COM lệch trước thuế; đây không phải lỗi định dạng hoặc thuế đơn thuần.
+
+**Files changed:** `log/failure.md`, `handoff/audit.md`, `handoff/todo.md`, `log/history.md`.
+
+**Verification:**
+
+```text
+App pre-tax (Waterfall - Phạt) vs FIN AB:
+TTN22.005 159,684,404 vs 174,380,851 => -14,696,447
+TTN24.002  23,681,532 vs  22,309,097 =>  +1,372,435
+TTN24.006  13,907,096 vs  13,907,096 =>          0
+TTN25.001  40,795,950 vs  34,678,989 =>  +6,116,961
+TTN25.005  47,072,553 vs  41,842,270 =>  +5,230,283
+
+Current preset KPI counts from all distinct Mức 3 customers:
+2, 5, 2, 8, 4
+FIN KQ Sale eligible KH mới counts:
+3, 4, 2, 5, 2
+```
+
+**Open questions for Cowork:** Cần FIN xác nhận rằng sheet/cờ `KH mới từ Q1(3)` là nguồn chuẩn của `Mức đạt` cho điều chỉnh +/-1%, rồi cung cấp bảng này trong input mới.
+
+**Risks/known gaps:** Cột `Thực nhận` hiện trừ thêm 10% thuế, trong khi số vàng FIN AB là `Tổng Incentive` trước thuế; hai cột này không được đối chiếu trực tiếp. Preset cần sửa nguồn KPI KH mới trước khi được gọi là khớp FIN.
+
+---
+
+## [2026-07-24 10:55] -- [AUTO] Khớp số vàng FIN Q1 -- REPORT
+
+**Done:** Thay proxy “đếm mọi KH Mức 3” bằng hai input FIN sở hữu trong Nhân sự: `Chỉ tiêu KH mới` (Mức giao) và `KH mới đạt` (Mức đạt). Tắt recipe thuế TNCN Q1 vì số vàng `KQ Sale. (7)!AB` là `Tổng Incentive` trước thuế. Cập nhật file mẫu, preset, workbook Q1 và tự điền Mức đạt đã có trong số vàng. Chuẩn hóa Team công nợ theo Jobs và để trống Quy tắc phạt để áp default 1%.
+
+**Files changed:** `INPUT-Incentive-mau.xlsx`, `2026Q1-Incentive-Table.xlsx`, `presets/trustana-q1.json`, `js/adapters/xlsx.js`, `README.md`, `scripts/app_browser_runner.js`, `test/v3_core.test.js`, `handoff/todo.md`, `handoff/audit.md`, `log/history.md`, `log/failure.md`.
+
+**Verification:**
+
+```text
+npm.cmd test
+=> tests 44; pass 44; fail 0
+=> dedicated Q1 test reads 2026Q1 input and KQ Sale. (7)!AB
+
+npm.cmd run qa
+=> status pass; file://; sheets 5; fields 35; blocks 21
+=> sample NET 13,907,096; console/page/network/overflow = 0
+
+2026Q1 direct reconciliation
+=> exact schema true; warnings []
+=> TTN22.005, TTN24.002, TTN24.006, TTN25.001, TTN25.005, TTN25.010, TTN25.099
+=> deltas [0, 0, 0, 0, 0, 0, 0] versus KQ Sale. (7)!AB
+```
+
+**Open questions for Cowork:** Không. FIN tiếp tục nhập `KH mới đạt` từ bảng approved của kỳ, không suy ra từ Mức 3.
+
+**Risks/known gaps:** Q1 preset hiện đúng phạm vi COM và `Thực nhận` tương đương FIN `Tổng Incentive` trước thuế. Nếu FIN cần thuế TNCN thực trả, cần một recipe thuế riêng với dữ liệu payroll được FIN xác nhận; không bật lại mặc định 10%.
+
+---
 
 ---
