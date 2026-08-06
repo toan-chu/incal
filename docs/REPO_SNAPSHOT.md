@@ -82,3 +82,4 @@ Bất kỳ thay đổi nào làm lệch các số này đều là lỗi.
 | Task | Trạng thái |
 |---|---|
 | `handoff/tasks/20260806_ui-balance-cleanup.md` | open - đang sửa spacing, cân bằng giao diện và dọn artifact sinh tự động |
+| `handoff/tasks/20260806_cap-nhat-readme.md` | open - cập nhật README và MIT badge |

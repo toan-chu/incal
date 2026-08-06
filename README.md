@@ -4,28 +4,32 @@
 
 **Đọc file Excel incentive → xuất phiếu PDF cho từng nhân viên → dashboard so sánh nhiều quý.**
 
-[![Chạy offline](https://img.shields.io/badge/Ch%E1%BA%A1y-100%25%20offline-4d148c?style=for-the-badge)](#-cài-đặt)
-[![Một file](https://img.shields.io/badge/C%C3%A0i%20%C4%91%E1%BA%B7t-Kh%C3%B4ng%20c%E1%BA%A7n-ff6200?style=for-the-badge)](#-cài-đặt)
-[![Trình duyệt](https://img.shields.io/badge/Ch%E1%BA%A1y%20b%E1%BA%B1ng-Tr%C3%ACnh%20duy%E1%BB%87t-1a5fb4?style=for-the-badge)](#-cài-đặt)
+[![Mở trực tiếp](https://img.shields.io/badge/M%E1%BB%9F-Tr%E1%BB%B1c%20ti%E1%BA%BFp-ff6200?style=for-the-badge)](#-mở-công-cụ)
+[![Chạy offline](https://img.shields.io/badge/Ch%E1%BA%A1y-100%25%20offline-4d148c?style=for-the-badge)](#-mở-công-cụ)
+[![MIT License](https://img.shields.io/badge/License-MIT-147a50?style=for-the-badge)](LICENSE)
 
 [![Excel là nguồn chân lý](https://img.shields.io/badge/Excel-Ngu%E1%BB%93n%20ch%C3%A2n%20l%C3%BD-147a50?logo=microsoftexcel&logoColor=white)](#-nguyên-tắc-vàng)
 [![PDF chữ thật](https://img.shields.io/badge/PDF-Ch%E1%BB%AF%20th%E1%BA%ADt%2C%20copy%20%C4%91%C6%B0%E1%BB%A3c-b42318?logo=adobeacrobatreader&logoColor=white)](#-nội-dung-phiếu)
 [![Dữ liệu không rời máy](https://img.shields.io/badge/D%E1%BB%AF%20li%E1%BB%87u-Kh%C3%B4ng%20r%E1%BB%9Di%20m%C3%A1y-a96200?logo=shieldsdotio&logoColor=white)](#-riêng-tư)
-[![Kiểm thử](https://img.shields.io/badge/Ki%E1%BB%83m%20th%E1%BB%AD-24%20ti%C3%AAu%20ch%C3%AD-32105e?logo=nodedotjs&logoColor=white)](#-kiểm-thử)
+[![Kiểm thử](https://img.shields.io/badge/Ki%E1%BB%83m%20th%E1%BB%AD-44%20ti%C3%AAu%20ch%C3%AD-32105e?logo=nodedotjs&logoColor=white)](#-kiểm-thử)
 
 </div>
 
 ---
 
-## 🚀 Cài đặt
+## 🚀 Mở công cụ
 
-**Không có bước cài đặt.** Tải repo về, mở `tool/Phieu-Incentive.html` bằng trình duyệt (nhấp đúp là được). Không cần Python, không cần Node, không cần mạng.
+> **Dùng hằng ngày:** vào thư mục `tool` → nhấp đúp **`Phieu-Incentive.html`**.
+
+Không có bước cài đặt. Không cần chạy `build.py`, không cần Python, Node hay mạng khi sử dụng.
 
 ```
-tool/Phieu-Incentive.html   ←  nhấp đúp vào đây
+incal/
+└── tool/
+    └── Phieu-Incentive.html   ← nhấp đúp file này
 ```
 
-Muốn gửi cho đồng nghiệp thì gửi đúng một file đó qua email hoặc Teams. Nó tự chứa mọi thứ.
+[`tool/Phieu-Incentive.html`](tool/Phieu-Incentive.html) là sản phẩm hoàn chỉnh, tự chứa toàn bộ giao diện, font và thư viện. Muốn gửi cho đồng nghiệp thì chỉ cần gửi file này qua email hoặc Teams.
 
 ---
 
