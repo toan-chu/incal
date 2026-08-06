@@ -1,112 +1,218 @@
-# 💜 Trustana Incentive
+<div align="center">
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-8A2BE2.svg)](./LICENSE)
-![JavaScript](https://img.shields.io/badge/JavaScript-Vanilla-F7DF1E?logo=javascript&logoColor=black)
-![HTML5](https://img.shields.io/badge/HTML5-file%3A%2F%2F-E34F26?logo=html5&logoColor=white)
-![SheetJS](https://img.shields.io/badge/Excel-SheetJS-217346?logo=microsoftexcel&logoColor=white)
-![Offline](https://img.shields.io/badge/Offline-No%20network-1D9E75)
-![Tests](https://img.shields.io/badge/tests-44%2F44%20passing-2ea44f)
-![No dependencies](https://img.shields.io/badge/dependencies-0-lightgrey)
+# 💜 incal — Phiếu Incentive Trustana
 
-> Công cụ tính incentive offline dành cho Finance: nạp Excel, kiểm soát công thức bằng sơ đồ, đối soát từng khoản và xuất báo cáo.
+**Đọc file Excel incentive → xuất phiếu PDF cho từng nhân viên → dashboard so sánh nhiều quý.**
 
-## ✨ Từ bảng tính đến kết quả trong 3 bước
+[![Chạy offline](https://img.shields.io/badge/Ch%E1%BA%A1y-100%25%20offline-4d148c?style=for-the-badge)](#-cài-đặt)
+[![Một file](https://img.shields.io/badge/C%C3%A0i%20%C4%91%E1%BA%B7t-Kh%C3%B4ng%20c%E1%BA%A7n-ff6200?style=for-the-badge)](#-cài-đặt)
+[![Trình duyệt](https://img.shields.io/badge/Ch%E1%BA%A1y%20b%E1%BA%B1ng-Tr%C3%ACnh%20duy%E1%BB%87t-1a5fb4?style=for-the-badge)](#-cài-đặt)
 
-### 1️⃣ Nạp dữ liệu
+[![Excel là nguồn chân lý](https://img.shields.io/badge/Excel-Ngu%E1%BB%93n%20ch%C3%A2n%20l%C3%BD-147a50?logo=microsoftexcel&logoColor=white)](#-nguyên-tắc-vàng)
+[![PDF chữ thật](https://img.shields.io/badge/PDF-Ch%E1%BB%AF%20th%E1%BA%ADt%2C%20copy%20%C4%91%C6%B0%E1%BB%A3c-b42318?logo=adobeacrobatreader&logoColor=white)](#-nội-dung-phiếu)
+[![Dữ liệu không rời máy](https://img.shields.io/badge/D%E1%BB%AF%20li%E1%BB%87u-Kh%C3%B4ng%20r%E1%BB%9Di%20m%C3%A1y-a96200?logo=shieldsdotio&logoColor=white)](#-riêng-tư)
+[![Kiểm thử](https://img.shields.io/badge/Ki%E1%BB%83m%20th%E1%BB%AD-24%20ti%C3%AAu%20ch%C3%AD-32105e?logo=nodedotjs&logoColor=white)](#-kiểm-thử)
 
-Mở `index.html` bằng Chrome hoặc Edge, vào tab **Input** và chọn workbook. Mỗi sheet trở thành một bảng dữ liệu; bạn chọn bảng chủ thể tính và ánh xạ mã, tên, nhóm ngay trên card của bảng đó.
+</div>
 
-Bạn có thể thử ngay với [workbook mẫu đã ẩn danh](./INPUT-Incentive-mau.xlsx).
+---
 
-### 2️⃣ Kiểm tra công thức
+## 🚀 Cài đặt
 
-Vào tab **Công thức**, nạp [preset Q1 mẫu](./presets/trustana-q1.json), rồi đọc luồng từ trái sang phải trên canvas:
+**Không có bước cài đặt.** Tải repo về, mở `tool/Phieu-Incentive.html` bằng trình duyệt (nhấp đúp là được). Không cần Python, không cần Node, không cần mạng.
 
-- 🟣 kéo khối từ thư viện vào canvas;
-- 🔗 nối output → input; kết nối sai kiểu bị chặn trước khi tính;
-- 🧮 mở cài đặt khối để chọn cột, phép toán hoặc điều kiện;
-- ✨ bấm **Tự xếp gọn** khi cần dọn sơ đồ;
-- 🏁 khối cuối của mỗi recipe tự trở thành **KẾT QUẢ**.
-
-### 3️⃣ Tính và xuất báo cáo
-
-Vào tab **Tính**, chọn chủ thể cần xem và bấm **Tính incentive**. Mỗi dòng kết quả có trace để đối soát. Có thể xuất:
-
-- 📊 Excel tổng hợp chi trả;
-- 👥 Excel theo từng khoản thu nhập;
-- 📄 PDF chi tiết từng người;
-- 🧾 JSON dữ liệu job hoặc báo cáo đầy đủ.
-
-Tab **Dashboard** là bước tùy chọn để ghép nhiều báo cáo JSON và xem tổng theo kỳ.
-
-## 🧱 Các nhóm khối
-
-| Nhóm | Dùng khi nào | Ví dụ |
-|---|---|---|
-| 📥 Nguồn | Chọn bảng và dòng thuộc chủ thể đang tính | **Lấy nguồn** |
-| 🧹 Dữ liệu | Lọc, tra cứu hoặc tạo cột phái sinh | **Lọc điều kiện**, **Tra bảng**, **Tính cột** |
-| 🧮 Tính toán | Cộng, trừ, nhân, chia, làm tròn, giới hạn | **Quét + Tổng**, **% của**, **Cap / Floor** |
-| 🧠 Logic | Rẽ nhánh theo điều kiện nghiệp vụ | **Điều kiện**, **Boolean**, **Thời gian** |
-| 🟠 Macro | Công thức đóng gói cho quy trình nhiều bước | Waterfall, thuế hoặc chia quỹ |
-
-### Khối “Tính cột”
-
-**Tính cột** nhận một bảng và trả lại bảng đó kèm cột mới. Mỗi khối thực hiện một phép toán `+`, `−`, `×` hoặc `÷` giữa hai toán hạng là cột hoặc hằng số. Có thể nối nhiều khối để tạo công thức dài hơn, ví dụ:
-
-```text
-Doanh thu sau thuế × Số tháng quá hạn × 1%
+```
+tool/Phieu-Incentive.html   ←  nhấp đúp vào đây
 ```
 
-Kiểu dữ liệu được kiểm tra ngay khi cấu hình và khi nối khối. Chia cho hằng số `0` bị chặn.
+Muốn gửi cho đồng nghiệp thì gửi đúng một file đó qua email hoặc Teams. Nó tự chứa mọi thứ.
 
-## 💾 Preset là gì?
+---
 
-Preset là “bản thiết kế tính” gồm schema, ánh xạ, recipe, node và vị trí canvas. Preset **không chứa các dòng nhân sự, lương hay job**.
+## 🔑 Nguyên tắc vàng
 
-- **Nạp preset**: mở file JSON và tự nhớ cấu hình cho phiên sau.
-- **Lưu preset**: tải JSON về máy để backup hoặc chia sẻ.
-- Nếu workbook lệch sheet/header so với preset, nút tính bị khóa để tránh chạy nhầm dữ liệu.
+> **File Excel là nguồn chân lý duy nhất.**
+> Công cụ **không tính lại** bất kỳ công thức nào. Nó chỉ đọc con số Excel đã tính sẵn rồi trình bày lại cho đẹp.
 
-## 🧾 Dành cho FIN: preset Q1 và file mẫu
+Nghĩa là: muốn sửa cách tính incentive → sửa trong Excel, không đụng tới công cụ. Công cụ không bao giờ là lý do khiến số bị sai.
 
-Luồng giao nhận là: **dùng file mẫu mới → FIN điền dữ liệu → nạp `trustana-q1.json` → bấm Tính**. Không đổi tên sheet hoặc header, vì preset sẽ khóa tính khi cấu trúc lệch.
+---
 
-- **Nhân sự / Chỉ tiêu KH mới, KH mới đạt**: FIN nhập số khách mới được giao và số **đạt** đã được FIN duyệt theo danh sách hợp đồng/6 tháng. App tính điều chỉnh `1% × (đạt - giao)` cho Mức 2/Mức 3; không tự coi mọi khách Mức 3 là đạt KPI.
-- **Jobs / Team**: chỉ dùng một trong bốn tuyến `General`, `New`, `KAE Admin`, `KAE Sale`. Ô Team trống được cảnh báo; phải hỏi FIN trước khi dùng rule theo Team.
-- **Jobs / Trạng thái thu**: chỉ nhập `Paid` hoặc `Unpaid`. Không còn cột `% đã thu`; preset Q1 luôn dựa trên trạng thái thu nhị phân.
-- **Công nợ chi tiết / Team, Nhân tố phạt**: là điều kiện tùy chọn cho chính sách phạt. Vẫn có thể tính mức mặc định khi để trống.
-- **Quy tắc phạt**: FIN thay các dòng ví dụ bằng rule của kỳ. `Ưu tiên = 1` là cao nhất; Job, Team, Nhân tố phạt, Từ/Đến tháng để trống nghĩa là áp dụng cho mọi giá trị. Không khớp rule nào thì app dùng **1%**. Công thức tiền phạt luôn là `Doanh thu sau thuế × Số tháng quá hạn × Tỷ lệ phạt hiệu lực`.
+## 🔄 Quy trình
 
-Preset Q1 hiện là phạm vi **COM** để test/đối soát trước. Mốc đối chiếu với `Tổng Incentive` FIN là **trước thuế**: `COM Waterfall - Khấu trừ`. `Thực nhận` là số sau khi trừ thêm `Thuế incentive`. Sheet `Quy tắc phạt` vẫn bắt buộc phải giữ để đúng schema: để trống toàn bộ dòng rule nghĩa là dùng **1% mặc định** cho cả kỳ; chỉ nhập rule khi cần ngoại lệ 2%/3% theo Job, Team hoặc nhân tố. Không dùng nó cho BO hoặc KAE pool cho đến khi có recipe riêng và số vàng FIN tương ứng.
-
-Trước khi tính, app cảnh báo ba lỗi nhập tay thường gặp: Team bị trống, Target quý thấp hơn tổng ba tháng lương, hoặc cùng Mã NV nhưng tên khác nhau giữa Jobs và Nhân sự. Cảnh báo không tự sửa dữ liệu.
-
-## 🔒 Offline và riêng tư
-
-- 🌐 Không CDN, không `fetch`, không gửi dữ liệu ra mạng.
-- 🧠 Workbook chỉ sống trong bộ nhớ của tab đang mở.
-- 💽 `localStorage` chỉ lưu preset; không lưu dòng dữ liệu Excel hay kết quả tính.
-- 🧪 Repo chỉ kèm workbook mẫu ẩn danh; dữ liệu FIN thật không được đưa vào version control.
-- 🛡️ Engine chỉ chạy các khối đã đăng ký, không dùng `eval` hay code động.
-
-## 📁 Cấu trúc nhanh
-
-```text
-index.html                    App offline
-INPUT-Incentive-mau.xlsx      Workbook mẫu ẩn danh
-presets/trustana-q1.json      Preset Q1 mẫu
-js/core/                      Engine, registry, validator
-js/ui/                        Formula canvas
-test/                         Regression tests
-handoff/                      Directive và audit evidence
+```
+   ┌──────────────────────┐
+   │  📊  FILE EXCEL      │   Mở bằng Excel
+   │  Incentive kỳ này    │   Nhập số → BẤM LƯU  ⚠️ bắt buộc
+   └──────────┬───────────┘
+              │  kéo thả
+              ▼
+   ┌──────────────────────────────────────────────┐
+   │  🌐  tool/Phieu-Incentive.html               │
+   │                                              │
+   │   ┌────────────────┐  ┌────────────────┐     │
+   │   │ 1 Phiếu        │  │ 2 Dashboard    │     │
+   │   │   incentive    │  │   nhiều kỳ     │     │
+   │   └───────┬────────┘  └───────┬────────┘     │
+   │           │                   │              │
+   │   ✓ Kiểm tra file      ✓ Tự nhận kỳ          │
+   │   ✓ Đối chiếu deal     ✓ Gộp nhiều quý       │
+   └───────────┼───────────────────┼──────────────┘
+               │                   │
+      ┌────────┴────────┐          ▼
+      ▼                 ▼     📈 Biểu đồ xu hướng
+  📄 15 file PDF   🖨️ 1 PDF      + bảng cộng dồn
+     (.zip)          15 trang
 ```
 
-## ✅ Kiểm thử
+---
 
-```powershell
-npm.cmd test
-npm.cmd run qa
-node --test
+## 📋 Dùng thế nào
+
+### 1️⃣ Xuất phiếu incentive
+
+| Bước | Việc |
+|:---:|---|
+| **1** | Mở file Excel incentive bằng **Excel**, nhập số liệu, **bấm Lưu**. |
+| **2** | Mở `tool/Phieu-Incentive.html`. |
+| **3** | Kéo thả file Excel vào thẻ **Phiếu incentive**. |
+| **4** | Xem bảng chi trả. Bấm **Xem phiếu** để soát từng người. |
+| **5** | Xuất: **Tải tất cả phiếu PDF (.zip)** · **In tất cả phiếu** · hoặc tải/in từng người trong hộp thoại. |
+
+### 2️⃣ Dashboard nhiều quý
+
+Sang thẻ **Dashboard nhiều kỳ**, thả nhiều file Excel của các quý khác nhau vào cùng lúc.
+
+Công cụ **tự nhận kỳ** từ tham số `ky_ten` trong sheet `Assumption` — không cần đặt tên file theo quy ước nào cả.
+
+---
+
+## ⚠️ Bước bắt buộc: lưu bằng Excel
+
+File `.xlsx` lưu song song **hai thứ** cho mỗi ô công thức:
+
+| | |
+|---|---|
+| 📐 Bản thân công thức | `=IFERROR(VLOOKUP(...))` |
+| 🔢 Giá trị Excel đã tính lần lưu gần nhất | `190011921.32` |
+
+Công cụ đọc **cái thứ hai**. Excel chỉ ghi nó khi bạn mở file bằng Excel và bấm Lưu.
+
+Nếu file được tạo hoặc sửa bằng công cụ khác — script Python, thư viện, vài trình xem trực tuyến — phần giá trị sẽ trống. Khi đó công cụ **báo đỏ và khoá nút xuất**, không bao giờ xuất ra phiếu trắng.
+
+> 🔧 **Cách xử lý:** mở file bằng Excel → bấm Lưu → nạp lại.
+
+File mẫu `Incentive-Template-TRONG.xlsx` cũng sẽ báo đỏ khi mới tải về — đúng như thiết kế, vì nó chưa có số nào.
+
+---
+
+## 🛡️ Công cụ tự kiểm tra những gì
+
+| Tình huống | Phản ứng |
+|---|---|
+| Thiếu sheet bắt buộc (`Assumption`, `Data`, `Payout`) | 🔴 Chặn, nêu tên sheet thiếu |
+| Ô công thức chưa có giá trị đã lưu | 🔴 Chặn, khoá nút xuất, hướng dẫn mở bằng Excel |
+| Cộng lợi nhuận từ danh sách job không khớp bảng tính | 🟡 Cảnh báo, nêu rõ tên người và số lệch |
+| Mọi thứ khớp | 🟢 Xanh, ghi rõ nguồn file, số người, số job |
+
+---
+
+## 📄 Nội dung phiếu
+
+- 👤 **Thông tin nhân viên** và nhóm tính (Sale COM / KAE / BO).
+- 💰 **Bảng tiền:** Gross → thu nhập chịu thuế → thuế TNCN → thuế phải nộp → **thực nhận**.
+- 🧮 **Cơ sở tính:** doanh thu, chi phí, lợi nhuận đã thu / chưa thu, chỉ tiêu quý, ba mức tỷ lệ, thưởng Trưởng bộ phận, phạt công nợ. Người thuộc nhóm KAE thì hiện pool từng tháng và tỷ lệ tham gia.
+- 📑 **Danh sách deal đóng góp:** mã job, khách hàng, tháng, doanh thu, chi phí, lợi nhuận, đã thu / chưa thu. Để sales tự đối chiếu xem đã đủ deal chưa.
+- ℹ️ Ghi chú: chi tiết công thức liên hệ phòng FIN.
+
+Chữ trong PDF là **chữ thật** — tìm kiếm, bôi đen, copy được. Không phải ảnh chụp.
+
+---
+
+## 🔒 Riêng tư
+
+Toàn bộ xử lý chạy trong trình duyệt trên máy bạn. File Excel **không được tải lên đâu cả**, công cụ không có bất kỳ kết nối mạng nào.
+
+File Excel chứa số liệu thật **không nằm trong git** — `.gitignore` chặn mọi `.xlsx` trừ file mẫu rỗng.
+
+---
+
+## 🧰 Cấu trúc repo
+
+```
+incal/
+├── 📗 Incentive-Template-TRONG.xlsx   file mẫu rỗng, đủ công thức
+├── 🌐 tool/
+│   ├── Phieu-Incentive.html           ← SẢN PHẨM (dựng ra, không sửa tay)
+│   ├── build.py                       đóng gói src/ thành 1 file
+│   ├── src/                           mã nguồn
+│   └── test/                          kiểm thử khói
+├── 📚 docs/REPO_SNAPSHOT.md           bản đồ repo
+├── 📝 handoff/tasks/                  tờ giao việc
+├── ⚖️ log/rules.md                    luật cứng
+└── 🗄️ archive/                        bản cũ, giữ để tra cứu
 ```
 
-Kỳ vọng chính của preset mẫu: **Phạt 2.676.672 VND**, **NET 12.516.386 VND**, **lệch 0**. Hiện có **44** regression tests.
+---
+
+## 🔧 Sửa công cụ
+
+```bash
+cd tool
+# sửa file trong src/
+python3 build.py     # dựng lại tool/Phieu-Incentive.html
+```
+
+| File trong `tool/src/` | Việc |
+|---|---|
+| `core.js` | Đọc workbook, dựng dữ liệu, kiểm tra file. |
+| `payslip.js` | Dựng phiếu PDF. |
+| `ui.js` | Giao diện, biểu đồ, xuất file. |
+| `app.css` | Trình bày, gồm cả kiểu dành cho lệnh In. |
+| `index.template.html` | Khung HTML. |
+| `vendor/` | SheetJS · jsPDF · autoTable · JSZip. |
+| `assets/` | Logo và font. |
+
+---
+
+## 🧪 Kiểm thử
+
+```bash
+cd tool/test
+npm install
+npm test
+```
+
+Hai bài chạy công cụ trong DOM giả lập:
+
+- **`smoke-happy.js`** — nạp file có số liệu, đối chiếu tổng, mở phiếu, đếm deal.
+- **`smoke-guard.js`** — thử file chưa lưu bằng Excel (phải bị chặn) và dashboard hai kỳ.
+
+Cần một file Excel có số liệu thật. Đặt tên `2026Q1_Incentive_MASTER.xlsx` ở gốc repo, hoặc:
+
+```bash
+INCAL_MASTER=/duong/dan/file.xlsx npm test
+```
+
+Không có file đó thì bài kiểm thử in `BỎ QUA` và thoát sạch.
+
+---
+
+## 🗺️ Công cụ dựa vào gì trong file Excel
+
+| Sheet | Dùng để |
+|---|---|
+| `Assumption` | Tham số qua named range (`ky_ten`, `ky_bat_dau`, `rate_*`…) và danh sách nhân sự. |
+| `Data` | Bảng job `tbl_jobs` — nhận diện qua tiêu đề `Thang`. |
+| `Payout` | Bảng chi trả — nhận diện qua tiêu đề `Ma_NV`. |
+| `Calc_Sale` · `Calc_KAE` · `Calc_Other` | Cơ sở tính hiển thị trên phiếu. |
+
+Bảng được tìm theo **tên tiêu đề**, không theo vị trí ô. Thêm bớt dòng hoặc dịch bảng lên xuống vẫn chạy; đổi tên cột thì phải sửa `core.js`.
+
+---
+
+<div align="center">
+
+**Trustana Finance Workspace** · Dữ liệu không rời khỏi thiết bị
+
+</div>

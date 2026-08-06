@@ -23,3 +23,7 @@ The Q1 adjustment implementation counted every distinct paid `Mức 3` customer 
 ## 2026-07-24 -- Keep FIN comparison basis separate from take-home pay
 
 FIN's `Tổng Incentive` is a pre-tax reconciliation value, while the app's `Thực nhận` must retain applicable tax deductions. Do not disable tax merely to make those differently defined columns equal. Reconcile FIN gold against `gross incentive - penalty`, and present tax plus take-home separately.
+
+## 2026-07-24 -- Preserve the confirmed allocation before redistributing a residual
+
+When FIN directs that an unallocated residual be shared among the remaining participants, do not replace the original allocation with a new weighted-denominator model. First preserve every confirmed participant amount, calculate the exact residual, then distribute only that residual across the explicitly named recipients and reconcile the result back to the pool.

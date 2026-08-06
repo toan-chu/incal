@@ -1,0 +1,13 @@
+{
+  "name": "incal-tool-test",
+  "private": true,
+  "description": "Kiểm thử khói cho tool/Phieu-Incentive.html, chạy trong DOM giả lập.",
+  "scripts": {
+    "test": "node smoke-happy.js && node smoke-guard.js",
+    "pdf-check": "node export-pdf-check.js"
+  },
+  "devDependencies": {
+    "adm-zip": "^0.6.0",
+    "jsdom": "^24.0.0"
+  }
+}

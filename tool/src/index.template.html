@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="data:,">
+<title>Trustana — Phiếu Incentive</title>
+<style>/*__CSS__*/</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="#"><img alt="Trustana"><span><strong>Incentive</strong><small>Phiếu &amp; Dashboard</small></span></a>
+  <nav class="tabs">
+    <button class="tab active" data-tab="slip"><i>1</i> Phiếu incentive</button>
+    <button class="tab" data-tab="dash"><i>2</i> Dashboard nhiều kỳ</button>
+  </nav>
+  <span class="spacer"></span>
+  <span class="period-chip" id="periodChip"><small>KỲ BÁO CÁO</small><b>—</b></span>
+</header>
+
+<main>
+
+  <!-- ================= THẺ 1 : PHIẾU ================= -->
+  <section class="panel active" id="panel-slip">
+    <div class="page-head">
+      <p class="eyebrow">NGUỒN: FILE EXCEL INCENTIVE</p>
+      <h1>Phiếu incentive từng nhân viên</h1>
+      <p>Công cụ chỉ đọc số đã tính sẵn trong file Excel, không tính lại. Mở file bằng Excel và bấm Lưu trước khi nạp vào đây.</p>
+    </div>
+
+    <div class="drop" id="dropSlip" role="button" tabindex="0" aria-label="Chọn file Excel incentive">
+      <div class="ico">▤</div>
+      <div>
+        <h3>Thả file Excel incentive vào đây</h3>
+        <p>Hoặc bấm để chọn file .xlsx của một kỳ</p>
+      </div>
+      <input type="file" id="fileSlip" accept=".xlsx,.xlsm">
+    </div>
+
+    <div class="banner" id="slipBanner" style="display:none"></div>
+
+    <div class="empty card" id="slipEmpty">
+      <strong>Chưa có dữ liệu</strong>
+      <span>Nạp file Excel để xem bảng chi trả và xuất phiếu.</span>
+    </div>
+
+    <div id="slipContent" style="display:none">
+      <div class="metrics" id="slipMetrics"></div>
+
+      <div class="card">
+        <div class="card-head"><h2>BẢNG CHI INCENTIVE</h2><b id="slipCount"></b></div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead><tr>
+              <th>#</th><th>MÃ NV</th><th>HỌ TÊN</th><th>NHÓM TÍNH</th>
+              <th class="num">GROSS</th><th class="num">THUẾ TNCN</th><th class="num">THỰC NHẬN</th>
+              <th class="num">DEAL</th><th></th>
+            </tr></thead>
+            <tbody id="peopleBody"></tbody>
+            <tfoot id="peopleFoot"></tfoot>
+          </table>
+        </div>
+        <div class="bar">
+          <span>XUẤT</span>
+          <button class="btn primary" id="btnZip">Tải tất cả phiếu PDF (.zip)</button>
+          <button class="btn" id="btnPrintAll">In tất cả phiếu</button>
+          <button class="btn ghost" id="btnCsv">Bảng tổng hợp · CSV</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= THẺ 2 : DASHBOARD ================= -->
+  <section class="panel" id="panel-dash">
+    <div class="page-head">
+      <p class="eyebrow">NHIỀU KỲ · XU HƯỚNG</p>
+      <h1>Dashboard tổng hợp</h1>
+      <p>Thả nhiều file Excel của các quý khác nhau. Công cụ tự nhận kỳ từ tham số trong file, không cần đặt tên theo quy ước.</p>
+    </div>
+
+    <div class="drop" id="dropDash" role="button" tabindex="0" aria-label="Chọn nhiều file Excel incentive">
+      <div class="ico">▦</div>
+      <div>
+        <h3>Thả nhiều file Excel vào đây</h3>
+        <p>Chọn được nhiều file cùng lúc · nạp thêm file sau vẫn giữ các kỳ đã có</p>
+      </div>
+      <input type="file" id="fileDash" accept=".xlsx,.xlsm" multiple>
+    </div>
+
+    <div class="banner" id="dashBanner" style="display:none"></div>
+    <div class="file-list" id="fileList"></div>
+
+    <div class="empty card" id="dashEmpty">
+      <strong>Chưa có kỳ nào</strong>
+      <span>Nạp từ hai file trở lên để thấy xu hướng giữa các quý.</span>
+    </div>
+
+    <div id="dashContent" style="display:none">
+      <div class="metrics" id="dashMetrics"></div>
+
+      <div class="charts">
+        <article class="card chart-box">
+          <div class="card-head" style="padding:0 0 10px;border:0"><h2>TỔNG THỰC NHẬN THEO KỲ</h2></div>
+          <canvas id="chartPeriod"></canvas>
+          <div class="legend"></div>
+        </article>
+        <article class="card chart-box">
+          <div class="card-head" style="padding:0 0 10px;border:0"><h2>TOP 8 NGƯỜI · THỰC NHẬN TỪNG KỲ</h2></div>
+          <canvas id="chartPeople"></canvas>
+          <div class="legend"></div>
+        </article>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>CHI TIẾT THEO NGƯỜI</h2><b id="dashCount"></b></div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead id="dashHead"></thead>
+            <tbody id="dashBody"></tbody>
+            <tfoot id="dashFoot"></tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<dialog id="dlg">
+  <div class="dlg-head">
+    <h2 id="dlgTitle">Phiếu incentive</h2>
+    <span class="grow"></span>
+    <button class="btn accent" id="dlgPdf">Tải PDF</button>
+    <button class="btn" id="dlgPrint">In</button>
+    <button class="btn ghost" id="dlgClose">Đóng</button>
+  </div>
+  <div class="dlg-body" id="dlgBody"></div>
+</dialog>
+
+<div id="printArea"></div>
+<div class="toast" id="toast"></div>
+
+<script>/*__XLSX__*/</script>
+<script>/*__JSPDF__*/</script>
+<script>/*__AUTOTABLE__*/</script>
+<script>/*__JSZIP__*/</script>
+<script>/*__CORE__*/</script>
+<script>/*__PAYSLIP__*/</script>
+<script>/*__UI__*/</script>
+<script>
+window.IncalUI.init({
+  logo: "/*__LOGO__*/",
+  fonts: {
+    montserrat: { regular: "/*__FONT_M400__*/", bold: "/*__FONT_M700__*/" },
+    quicksand: { regular: "/*__FONT_Q400__*/", bold: "/*__FONT_Q700__*/" }
+  }
+});
+</script>
+</body>
+</html>

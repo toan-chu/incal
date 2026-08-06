@@ -1,19 +1,19 @@
-# Sensitive or period-specific business data
+# Dữ liệu kinh doanh theo kỳ — KHÔNG đẩy lên git
 *.xlsx
-!INPUT-Incentive-mau.xlsx
 *.xls
-docs/origin/
+!Incentive-Template-TRONG.xlsx
 reports/*.json
-outputs/
-tmp/
 
-# Local user state and exported artifacts
-v3/local-data/
-v3/exports/
+# Thư mục tạm sinh ra khi kiểm thử — không đẩy lên git
+outputs/
+output/
+tmp/
+.playwright-cli/
+
+# Phụ thuộc và trạng thái máy
+node_modules/
 *.local.json
 
-# Codex CLI artifacts
+# Artifact của Codex CLI
 .codex/
 .agents/
-
-docs/INPUT-real-*.xlsx
