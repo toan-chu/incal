@@ -151,6 +151,8 @@ table.data tfoot td{padding:10px 12px;font-weight:700;background:var(--brand-sof
   background:var(--brand-soft);color:var(--brand)}
 .pill.bo{background:var(--accent-soft);color:#b34500}
 .pill.kae{background:#eaf3ff;color:#1a5fb4}
+.pill.night{background:#efe9f7;color:var(--brand)}
+.pill.ops{background:var(--success-soft);color:var(--success)}
 .tag-unpaid{color:var(--accent);font-weight:700}
 .zero-row td{color:var(--mute)}
 
@@ -226,6 +228,9 @@ table.slip-t tr.strong td{font-weight:700}
 .file-chip b{color:var(--brand)}
 .file-chip button{border:0;background:var(--brand-soft);color:var(--brand);border-radius:50%;width:20px;height:20px;
   cursor:pointer;font-size:13px;line-height:1}
+.file-chip.bonus{border-color:#bfe3d3}
+.file-chip.bonus b{color:var(--success)}
+.file-chip.bonus button{background:var(--success-soft);color:var(--success)}
 
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;
   padding:10px 18px;border-radius:24px;font-size:13px;z-index:60;box-shadow:var(--shadow);opacity:0;
@@ -273,7 +278,8 @@ table.slip-t tr.strong td{font-weight:700}
   <a class="brand" href="#"><img alt="Trustana"><span><strong>Incentive</strong><small>Phiếu &amp; Dashboard</small></span></a>
   <nav class="tabs">
     <button class="tab active" data-tab="slip"><i>1</i> Phiếu incentive</button>
-    <button class="tab" data-tab="dash"><i>2</i> Dashboard nhiều kỳ</button>
+    <button class="tab" data-tab="bonus"><i>2</i> Phiếu phụ cấp</button>
+    <button class="tab" data-tab="dash"><i>3</i> Dashboard nhiều kỳ</button>
   </nav>
   <span class="spacer"></span>
   <span class="period-chip" id="periodChip"><small>KỲ BÁO CÁO</small><b>—</b></span>
@@ -331,19 +337,69 @@ table.slip-t tr.strong td{font-weight:700}
     </div>
   </section>
 
-  <!-- ================= THẺ 2 : DASHBOARD ================= -->
+  <!-- ================= THẺ 2 : PHỤ CẤP ================= -->
+  <section class="panel" id="panel-bonus">
+    <div class="page-head">
+      <p class="eyebrow">NGUỒN: FILE EXCEL PHỤ CẤP THEO THÁNG</p>
+      <h1>Phiếu phụ cấp trực đêm &amp; OPS</h1>
+      <p>Trực đêm 22:00–06:00 (phụ cấp theo giờ + thưởng BCA) và phụ cấp OPS tại sân bay / cảng / ga. Công cụ chỉ đọc số đã tính sẵn trong file Excel, không tính lại.</p>
+    </div>
+
+    <div class="drop" id="dropBonus" role="button" tabindex="0" aria-label="Chọn file Excel phụ cấp">
+      <div class="ico">☾</div>
+      <div>
+        <h3>Thả file Excel phụ cấp vào đây</h3>
+        <p>Hoặc bấm để chọn file .xlsx của một tháng</p>
+      </div>
+      <input type="file" id="fileBonus" accept=".xlsx,.xlsm">
+    </div>
+
+    <div class="banner" id="bonusBanner" style="display:none"></div>
+
+    <div class="empty card" id="bonusEmpty">
+      <strong>Chưa có dữ liệu</strong>
+      <span>Nạp file Excel phụ cấp để xem bảng chi và xuất phiếu.</span>
+    </div>
+
+    <div id="bonusContent" style="display:none">
+      <div class="metrics" id="bonusMetrics"></div>
+
+      <div class="card">
+        <div class="card-head"><h2>BẢNG CHI PHỤ CẤP</h2><b id="bonusCount"></b></div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead><tr>
+              <th>#</th><th>MÃ NV</th><th>HỌ TÊN</th><th>KHOẢN HƯỞNG</th>
+              <th class="num">CA · CHUYẾN</th><th class="num">TRỰC ĐÊM</th><th class="num">OPS</th>
+              <th class="num">GROSS</th><th class="num">THUẾ TNCN</th><th class="num">THỰC NHẬN</th><th></th>
+            </tr></thead>
+            <tbody id="bonusBody"></tbody>
+            <tfoot id="bonusFoot"></tfoot>
+          </table>
+        </div>
+        <div class="bar">
+          <span>XUẤT</span>
+          <button class="btn primary" id="btnBonusZip">Tải tất cả phiếu PDF (.zip)</button>
+          <button class="btn" id="btnBonusPrintAll">In tất cả phiếu</button>
+          <button class="btn ghost" id="btnBonusCsv">Bảng tổng hợp · CSV</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= THẺ 3 : DASHBOARD ================= -->
   <section class="panel" id="panel-dash">
     <div class="page-head">
       <p class="eyebrow">NHIỀU KỲ · XU HƯỚNG</p>
       <h1>Dashboard tổng hợp</h1>
-      <p>Thả nhiều file Excel của các quý khác nhau. Công cụ tự nhận kỳ từ tham số trong file, không cần đặt tên theo quy ước.</p>
+      <p>Thả nhiều file Excel của các kỳ khác nhau — incentive theo quý và phụ cấp theo tháng đều nhận. Công cụ tự phân loại và tự nhận kỳ từ tham số trong file, không cần đặt tên theo quy ước.</p>
     </div>
 
-    <div class="drop" id="dropDash" role="button" tabindex="0" aria-label="Chọn nhiều file Excel incentive">
+    <div class="drop" id="dropDash" role="button" tabindex="0" aria-label="Chọn nhiều file Excel">
       <div class="ico">▦</div>
       <div>
         <h3>Thả nhiều file Excel vào đây</h3>
-        <p>Chọn được nhiều file cùng lúc · nạp thêm file sau vẫn giữ các kỳ đã có</p>
+        <p>Incentive · phụ cấp · chọn nhiều file cùng lúc · nạp thêm file sau vẫn giữ các kỳ đã có</p>
       </div>
       <input type="file" id="fileDash" accept=".xlsx,.xlsm" multiple>
     </div>
@@ -357,6 +413,7 @@ table.slip-t tr.strong td{font-weight:700}
     </div>
 
     <div id="dashContent" style="display:none">
+      <p class="eyebrow" style="margin:0 0 10px">INCENTIVE</p>
       <div class="metrics" id="dashMetrics"></div>
 
       <div class="charts">
@@ -379,6 +436,35 @@ table.slip-t tr.strong td{font-weight:700}
             <thead id="dashHead"></thead>
             <tbody id="dashBody"></tbody>
             <tfoot id="dashFoot"></tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="dashBonusContent" style="display:none">
+      <p class="eyebrow" style="margin:26px 0 10px">PHỤ CẤP TRỰC ĐÊM &amp; OPS</p>
+      <div class="metrics" id="dashBonusMetrics"></div>
+
+      <div class="charts">
+        <article class="card chart-box">
+          <div class="card-head" style="padding:0 0 10px;border:0"><h2>TỔNG PHỤ CẤP THỰC NHẬN THEO KỲ</h2></div>
+          <canvas id="chartBonusPeriod"></canvas>
+          <div class="legend"></div>
+        </article>
+        <article class="card chart-box">
+          <div class="card-head" style="padding:0 0 10px;border:0"><h2>TỶ TRỌNG TRỰC ĐÊM · OPS THEO KỲ</h2></div>
+          <canvas id="chartBonusSplit"></canvas>
+          <div class="legend"></div>
+        </article>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>CHI TIẾT PHỤ CẤP THEO NGƯỜI</h2><b id="dashBonusCount"></b></div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead id="dashBonusHead"></thead>
+            <tbody id="dashBonusBody"></tbody>
+            <tfoot id="dashBonusFoot"></tfoot>
           </table>
         </div>
       </div>
@@ -1125,6 +1211,230 @@ https://github.com/nodeca/pako/blob/main/LICENSE
 });
 </script>
 <script>/* ==========================================================================
+   INCAL BONUS — đọc file Excel PHỤ CẤP (trực đêm + OPS) và dựng dữ liệu phiếu.
+   Cùng nguyên tắc với core.js: không tính lại bất kỳ công thức nào,
+   chỉ đọc giá trị Excel đã lưu sẵn.
+   ========================================================================== */
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) module.exports = factory(
+    typeof require === 'function' ? require('./core.js') : null);
+  else root.IncalBonus = factory(root.IncalCore);
+})(typeof self !== 'undefined' ? self : this, function (Core) {
+  'use strict';
+
+  function C() { return Core || (typeof window !== 'undefined' ? window.IncalCore : null); }
+
+  function txt(v) { return v === undefined || v === null ? '' : String(v).trim(); }
+  function num(v) { const n = typeof v === 'number' ? v : parseFloat(v); return isFinite(n) ? n : 0; }
+
+  function excelDate(v) {
+    if (v instanceof Date) return v;
+    if (typeof v !== 'number') return null;
+    return new Date(Math.round((v - 25569) * 86400 * 1000));
+  }
+
+  /* Excel lưu giờ dưới dạng phân số của một ngày. 0,916666 -> "22:00". */
+  function hhmm(v) {
+    if (v === undefined || v === null || v === '') return '';
+    if (v instanceof Date) {
+      return String(v.getHours()).padStart(2, '0') + ':' + String(v.getMinutes()).padStart(2, '0');
+    }
+    if (typeof v !== 'number') return txt(v);
+    const mins = Math.round((v % 1) * 24 * 60);
+    return String(Math.floor(mins / 60) % 24).padStart(2, '0') + ':' +
+      String(mins % 60).padStart(2, '0');
+  }
+
+  const NAMES = ['ky_ten', 'ky_bat_dau', 'ky_ket_thuc', 'loai_bang',
+    'rate_gio_bien', 'rate_gio_loi', 'he_so_le', 'bca_spark', 'bca_blaze',
+    'ops_0600_0800', 'ops_0800_1800', 'ops_1800_2200', 'ops_2200_0100',
+    'ops_0100_0600', 'ops_phu_troi_le', 'ops_kg_1nguoi', 'ops_nguoi_toi_da',
+    'giam_tru_ca_nhan_thang', 'giam_tru_phu_thuoc_thang', 'rate_khau_tru_vang_lai'];
+
+  const PAYOUT_FIELDS = [
+    'So_Ca_Truc', 'So_Chuyen_OPS', 'PC_TrucDem', 'Phi_OPS', 'Tong_PC_Gross',
+    'BHXH', 'Giam_Tru_Ap_Dung', 'TN_Chiu_Thue', 'Thue_TNCN', 'Cong_Tru_Khac',
+    'PC_Thuc_Nhan'
+  ];
+  /* Cột do công thức sinh ra — dùng để phát hiện file chưa được Excel lưu. */
+  const KEY_FIELDS = ['Tong_PC_Gross', 'TN_Chiu_Thue', 'PC_Thuc_Nhan'];
+
+  /* Nhận diện: đúng file phụ cấp thì mới nhận, tránh nuốt nhầm file incentive. */
+  function looksLikeBonus(wb) {
+    const S = wb.Sheets || {};
+    if (S.Calc_TrucDem || S.Calc_OPS) return true;
+    const core = C();
+    return core ? txt(core.namedValue(wb, 'loai_bang')) === 'PHU_CAP' : false;
+  }
+
+  function parse(wb, fileName) {
+    const core = C();
+    if (!core) throw new Error('Thiếu IncalCore.');
+    const warnings = [];
+    const S = wb.Sheets;
+
+    const need = ['Assumption', 'Data', 'Payout'];
+    const missing = need.filter(function (n) { return !S[n]; });
+    if (missing.length) {
+      throw new Error('File không đúng mẫu Phụ cấp. Thiếu sheet: ' + missing.join(', '));
+    }
+    if (!S.Calc_TrucDem && !S.Calc_OPS) {
+      throw new Error('File không đúng mẫu Phụ cấp. Thiếu sheet Calc_TrucDem / Calc_OPS. ' +
+        'Có phải anh đang thả nhầm file Incentive vào thẻ Phụ cấp?');
+    }
+
+    /* --- tham số & kỳ --- */
+    const params = {};
+    NAMES.forEach(function (n) {
+      const v = core.namedValue(wb, n);
+      if (v !== undefined) params[n] = v;
+    });
+    if (params.ky_ten === undefined) {
+      warnings.push('Không đọc được tên kỳ (ky_ten). Dùng tên file thay thế.');
+    }
+    const period = {
+      name: txt(params.ky_ten) || (fileName || '').replace(/\.xlsx?$/i, ''),
+      from: excelDate(params.ky_bat_dau),
+      to: excelDate(params.ky_ket_thuc)
+    };
+
+    /* --- nhân sự trong Assumption --- */
+    const staff = core.readTable(S.Assumption, 'Ma_NV', 0, 10).rows;
+    const staffByName = {};
+    staff.forEach(function (s) { if (txt(s.Ho_Ten)) staffByName[txt(s.Ho_Ten)] = s; });
+
+    /* --- nhật ký ca: neo vào tiêu đề "Ngay" (khớp chính xác, khác "Loai_Ngay") --- */
+    const shiftTbl = core.readTable(S.Data, 'Ngay', 0, 30);
+    const shifts = shiftTbl.rows
+      .filter(function (s) { return txt(s.Ho_Ten); })
+      .map(function (s) {
+        return {
+          ngay: excelDate(s.Ngay), maNV: txt(s.Ma_NV), hoTen: txt(s.Ho_Ten),
+          loaiCa: txt(s.Loai_Ca), loaiNgay: txt(s.Loai_Ngay),
+          gioBatDau: hhmm(s.Gio_Bat_Dau), gioKetThuc: hhmm(s.Gio_Ket_Thuc),
+          maJob: txt(s.Ma_Job), trongLuong: num(s.Trong_Luong_Kg),
+          soNhanSu: num(s.So_Nhan_Su), backup: txt(s.Backup_Nhan_Ca),
+          gioBien: num(s.Gio_Bien), gioLoi: num(s.Gio_Loi), tongGio: num(s.Tong_Gio),
+          mucBCA: txt(s.Muc_BCA), pcGio: num(s.PC_Gio), thuongBCA: num(s.Thuong_BCA),
+          pcTrucDem: num(s.PC_TrucDem), phiOPS: num(s.Phi_OPS), tongDong: num(s.Tong_Dong),
+          canhBao: txt(s.Canh_Bao), ghiChu: txt(s.Ghi_Chu)
+        };
+      });
+    if (!shifts.length) warnings.push('Không đọc được dòng ca nào trong sheet Data.');
+
+    const byName = function (arr) {
+      const m = {};
+      arr.forEach(function (r) { if (txt(r.Ho_Ten)) m[txt(r.Ho_Ten)] = r; });
+      return m;
+    };
+    const trucByName = byName(S.Calc_TrucDem ? core.readTable(S.Calc_TrucDem, 'Ma_NV', 0, 14).rows : []);
+    const opsByName = byName(S.Calc_OPS ? core.readTable(S.Calc_OPS, 'Ma_NV', 0, 10).rows : []);
+
+    /* --- Payout --- */
+    const pt = core.readTable(S.Payout, 'Ma_NV', 0, 18);
+    if (pt.headerRow < 0) throw new Error('Không tìm thấy bảng Payout (cột Ma_NV).');
+
+    let blank = 0;
+    const people = pt.rows.filter(function (r) { return txt(r.Ma_NV); }).map(function (r) {
+      const name = txt(r.Ho_Ten);
+      const p = {
+        maNV: txt(r.Ma_NV), hoTen: name, stt: num(r.STT),
+        boPhan: txt(r.Bo_Phan) || (staffByName[name] ? txt(staffByName[name].Bo_Phan) : ''),
+        cachTinhThue: txt(r.Cach_Tinh_Thue)
+      };
+      PAYOUT_FIELDS.forEach(function (k) { p[k] = num(r[k]); });
+
+      const hasValue = KEY_FIELDS.some(function (k) { return typeof r[k] === 'number'; });
+      if (!hasValue) blank++;
+      p.__blank = !hasValue;
+
+      p.shifts = shifts.filter(function (s) { return s.hoTen === name; });
+      p.shiftSummary = summarise(p.shifts);
+      p.truc = trucByName[name] || null;
+      p.ops = opsByName[name] || null;
+      p.staff = staffByName[name] || null;
+      p.groups = [];
+      if (p.So_Ca_Truc > 0 || p.PC_TrucDem > 0) p.groups.push('TRUC_DEM');
+      if (p.So_Chuyen_OPS > 0 || p.Phi_OPS > 0) p.groups.push('OPS');
+      return p;
+    });
+
+    if (blank === people.length && people.length > 0) {
+      warnings.push('CHẶN: file không chứa số đã tính. Excel chỉ ghi lại kết quả công thức khi anh ' +
+        'mở file bằng Excel và bấm Lưu. Hãy mở file, bấm Lưu, rồi nạp lại.');
+    } else if (blank > 0) {
+      warnings.push('CHẶN: ' + blank + '/' + people.length + ' dòng trong Payout không có số đã tính. ' +
+        'Mở file bằng Excel, bấm Lưu, rồi nạp lại.');
+    }
+
+    /* --- đối chiếu: cộng từ nhật ký ca so với Payout --- */
+    if (!blank) {
+      people.forEach(function (p) {
+        const fromLog = p.shiftSummary.tong;
+        if (Math.abs(fromLog - p.Tong_PC_Gross) > 1) {
+          warnings.push('Lệch phụ cấp của ' + p.hoTen + ': bảng chi ' + Math.round(p.Tong_PC_Gross) +
+            ' nhưng cộng từ nhật ký ca ra ' + Math.round(fromLog) + '.');
+        }
+      });
+      const orphan = {};
+      shifts.forEach(function (s) {
+        if (!people.some(function (p) { return p.hoTen === s.hoTen; })) orphan[s.hoTen] = true;
+      });
+      Object.keys(orphan).forEach(function (n) {
+        warnings.push('Có ca của "' + n + '" trong sheet Data nhưng không có dòng trong Payout. ' +
+          'Kiểm tra chính tả họ tên hoặc bổ sung vào danh sách nhân sự.');
+      });
+      shifts.forEach(function (s) {
+        if (s.canhBao) {
+          warnings.push('Ca ngày ' + fmtDate(s.ngay) + ' của ' + s.hoTen + ': ' + s.canhBao + '.');
+        }
+      });
+    }
+
+    const totals = {};
+    PAYOUT_FIELDS.forEach(function (k) {
+      totals[k] = people.reduce(function (s, p) { return s + p[k]; }, 0);
+    });
+
+    return {
+      kind: 'BONUS', fileName: fileName || '', period: period, params: params,
+      warnings: warnings, people: people, totals: totals, shifts: shifts,
+      staff: staff
+    };
+  }
+
+  function fmtDate(d) {
+    if (!d) return '';
+    const p = function (x) { return String(x).padStart(2, '0'); };
+    return p(d.getDate()) + '/' + p(d.getMonth() + 1) + '/' + d.getFullYear();
+  }
+
+  function summarise(list) {
+    const s = {
+      count: list.length, caTruc: 0, chuyenOPS: 0, caLe: 0,
+      gioBien: 0, gioLoi: 0, tongGio: 0, spark: 0, blaze: 0,
+      pcGio: 0, thuongBCA: 0, pcTrucDem: 0, phiOPS: 0, tong: 0, tongKG: 0
+    };
+    list.forEach(function (x) {
+      if (x.loaiCa === 'OPS') { s.chuyenOPS++; s.tongKG += x.trongLuong; }
+      else s.caTruc++;
+      if (x.loaiNgay === 'Lễ') s.caLe++;
+      if (x.mucBCA === 'Spark') s.spark++;
+      if (x.mucBCA === 'Blaze') s.blaze++;
+      s.gioBien += x.gioBien; s.gioLoi += x.gioLoi; s.tongGio += x.tongGio;
+      s.pcGio += x.pcGio; s.thuongBCA += x.thuongBCA;
+      s.pcTrucDem += x.pcTrucDem; s.phiOPS += x.phiOPS; s.tong += x.tongDong;
+    });
+    return s;
+  }
+
+  return {
+    parse: parse, looksLikeBonus: looksLikeBonus,
+    summarise: summarise, hhmm: hhmm, fmtDate: fmtDate
+  };
+});
+</script>
+<script>/* ==========================================================================
    INCAL PAYSLIP — dựng phiếu incentive PDF (A4) bằng jsPDF + autoTable.
    Chữ tiếng Việt là chữ thật (nhúng Quicksand + Montserrat), không phải ảnh.
    ========================================================================== */
@@ -1382,6 +1692,286 @@ https://github.com/nodeca/pako/blob/main/LICENSE
 });
 </script>
 <script>/* ==========================================================================
+   INCAL BONUS SLIP — dựng phiếu PHỤ CẤP (trực đêm + OPS) PDF khổ A4.
+   Cùng bộ font và bảng màu với phiếu incentive.
+   ========================================================================== */
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) module.exports = factory();
+  else root.IncalBonusSlip = factory();
+})(typeof self !== 'undefined' ? self : this, function () {
+  'use strict';
+
+  const PURPLE = [77, 20, 140];
+  const ORANGE = [255, 98, 0];
+  const GREEN = [20, 122, 80];
+  const INK = [32, 28, 40];
+  const MUTE = [120, 114, 132];
+  const LINE = [222, 217, 230];
+  const SOFT = [246, 243, 250];
+
+  function vnd(n) {
+    const neg = n < 0;
+    let s = String(Math.round(Math.abs(n) || 0));
+    s = s.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return (neg ? '-' : '') + s;
+  }
+  function hrs(n) {
+    return (Math.round((n || 0) * 10) / 10).toString().replace('.', ',') + 'h';
+  }
+  function dmy(d) {
+    if (!d) return '';
+    const p = function (x) { return String(x).padStart(2, '0'); };
+    return p(d.getDate()) + '/' + p(d.getMonth() + 1) + '/' + d.getFullYear();
+  }
+  function num(v) { const n = typeof v === 'number' ? v : parseFloat(v); return isFinite(n) ? n : 0; }
+
+  const GROUP_LABEL = { TRUC_DEM: 'Trực đêm', OPS: 'OPS sân bay' };
+
+  /* --------------------------------------------------------------------- */
+
+  function build(jsPDFCtor, fonts, report, person, opts) {
+    opts = opts || {};
+    const doc = new jsPDFCtor({ unit: 'mm', format: 'a4', compress: true });
+
+    doc.addFileToVFS('Montserrat-Regular.ttf', fonts.montserrat.regular);
+    doc.addFont('Montserrat-Regular.ttf', 'Montserrat', 'normal');
+    doc.addFileToVFS('Montserrat-Bold.ttf', fonts.montserrat.bold);
+    doc.addFont('Montserrat-Bold.ttf', 'Montserrat', 'bold');
+    doc.addFileToVFS('Quicksand-Regular.ttf', fonts.quicksand.regular);
+    doc.addFont('Quicksand-Regular.ttf', 'Quicksand', 'normal');
+    doc.addFileToVFS('Quicksand-Bold.ttf', fonts.quicksand.bold);
+    doc.addFont('Quicksand-Bold.ttf', 'Quicksand', 'bold');
+    doc.setFont('Montserrat', 'normal');
+
+    const W = doc.internal.pageSize.getWidth();
+    const M = 14;
+    let y = 0;
+
+    /* ---- đầu trang ---- */
+    const range = report.period.from && report.period.to
+      ? dmy(report.period.from) + ' — ' + dmy(report.period.to) : '';
+
+    if (opts.logo) {
+      const lw = 32, lh = lw * (opts.logoRatio || 137 / 871);
+      try { doc.addImage(opts.logo, 'PNG', M, 13 - lh / 2, lw, lh); } catch (e) { /* bỏ qua logo lỗi */ }
+    } else {
+      doc.setFont('Quicksand', 'bold'); doc.setFontSize(13);
+      doc.setTextColor.apply(doc, PURPLE);
+      doc.text(opts.company || 'TRUSTANA', M, 15);
+    }
+
+    doc.setFont('Quicksand', 'bold'); doc.setFontSize(14);
+    doc.setTextColor.apply(doc, PURPLE);
+    doc.text('PHIẾU PHỤ CẤP', W - M, 12.5, { align: 'right' });
+    doc.setFont('Montserrat', 'normal'); doc.setFontSize(8);
+    doc.setTextColor.apply(doc, MUTE);
+    doc.text('Trực đêm & OPS  ·  ' + (report.period.name || '') + (range ? '  ·  ' + range : ''),
+      W - M, 18, { align: 'right' });
+
+    doc.setFillColor.apply(doc, PURPLE); doc.rect(M, 22, W - 2 * M, 0.8, 'F');
+    doc.setFillColor.apply(doc, GREEN); doc.rect(M, 22, 26, 0.8, 'F');
+
+    y = 30;
+
+    /* ---- khối nhân viên ---- */
+    doc.setDrawColor.apply(doc, LINE);
+    doc.setFillColor.apply(doc, SOFT);
+    doc.roundedRect(M, y, W - 2 * M, 18, 1.5, 1.5, 'FD');
+    doc.setTextColor.apply(doc, MUTE); doc.setFontSize(7.5);
+    doc.text('HỌ VÀ TÊN', M + 4, y + 6);
+    doc.text('MÃ NHÂN VIÊN', M + 84, y + 6);
+    doc.text('BỘ PHẬN', M + 118, y + 6);
+    doc.text('KHOẢN HƯỞNG', M + 142, y + 6);
+    doc.setTextColor.apply(doc, INK); doc.setFont('Montserrat', 'bold'); doc.setFontSize(11);
+    doc.text(person.hoTen || '', M + 4, y + 13);
+    doc.setFontSize(9.5);
+    doc.text(person.maNV || '', M + 84, y + 13);
+    doc.text(person.boPhan || '—', M + 118, y + 13);
+    doc.setFontSize(8);
+    doc.text(person.groups.map(function (g) { return GROUP_LABEL[g] || g; }).join(' + ') || '—',
+      M + 142, y + 13);
+    y += 25;
+
+    /* ---- bảng tiền ---- */
+    const s = person.shiftSummary;
+    const money = [
+      ['Phụ cấp theo giờ  (' + hrs(s.gioBien) + ' khung biên + ' + hrs(s.gioLoi) + ' khung lõi)', s.pcGio],
+      ['Thưởng BCA  (' + s.spark + ' ca Spark, ' + s.blaze + ' ca Blaze)', s.thuongBCA],
+      ['Phụ cấp trực đêm', person.PC_TrucDem, 'sub'],
+      ['Phụ cấp OPS  (' + person.So_Chuyen_OPS + ' chuyến)', person.Phi_OPS],
+      ['TỔNG PHỤ CẤP (gross)', person.Tong_PC_Gross, 'strong'],
+      ['Bảo hiểm xã hội', -Math.abs(person.BHXH)],
+      ['Giảm trừ gia cảnh áp dụng', -Math.abs(person.Giam_Tru_Ap_Dung)],
+      ['Thu nhập chịu thuế', person.TN_Chiu_Thue, 'sub'],
+      ['Thuế TNCN  (' + (person.cachTinhThue || '—') + ')', -Math.abs(person.Thue_TNCN), 'sub'],
+      ['Cộng / trừ khác', person.Cong_Tru_Khac]
+    ].filter(function (r) { return r[1] !== 0 || r[2]; });
+
+    doc.autoTable({
+      startY: y,
+      margin: { left: M, right: M },
+      head: [['DIỄN GIẢI', 'SỐ TIỀN (VND)']],
+      body: money.map(function (r) { return [r[0], vnd(r[1])]; }),
+      styles: { font: 'Montserrat', fontSize: 9, cellPadding: { top: 2, bottom: 2, left: 3, right: 3 }, textColor: INK, lineColor: LINE, lineWidth: 0.1 },
+      headStyles: { font: 'Quicksand', fontStyle: 'bold', fontSize: 7.5, fillColor: PURPLE, textColor: [255, 255, 255] },
+      columnStyles: { 1: { halign: 'right', font: 'Montserrat' } },
+      didParseCell: function (d) {
+        if (d.section !== 'body') return;
+        const kind = money[d.row.index][2];
+        if (kind === 'strong' || kind === 'sub') d.cell.styles.fontStyle = 'bold';
+        if (kind === 'sub') d.cell.styles.fillColor = SOFT;
+        if (kind === 'strong') d.cell.styles.fillColor = [237, 246, 242];
+      }
+    });
+    y = doc.lastAutoTable.finalY;
+
+    /* ---- dòng THỰC NHẬN ---- */
+    doc.setFillColor.apply(doc, ORANGE);
+    doc.rect(M, y, W - 2 * M, 13, 'F');
+    doc.setTextColor(255, 255, 255); doc.setFont('Quicksand', 'bold');
+    doc.setFontSize(10); doc.text('PHỤ CẤP THỰC NHẬN', M + 3, y + 8.5);
+    doc.setFontSize(13);
+    doc.text(vnd(person.PC_Thuc_Nhan) + ' đ', W - M - 3, y + 8.7, { align: 'right' });
+    y += 20;
+
+    /* ---- cơ sở tính ---- */
+    doc.setTextColor.apply(doc, PURPLE); doc.setFont('Quicksand', 'bold'); doc.setFontSize(9);
+    doc.text('CƠ SỞ TÍNH', M, y); y += 2;
+
+    const p = report.params || {};
+    const basis = [];
+    basis.push(['Số ca trực đêm', String(s.caTruc), 'Số chuyến OPS', String(s.chuyenOPS)]);
+    basis.push(['Ca / chuyến ngày lễ', String(s.caLe), 'Tổng giờ trực', hrs(s.tongGio)]);
+    if (s.caTruc) {
+      basis.push([
+        'Khung biên 22–24 & 04–06', hrs(s.gioBien) + '  ×  ' + vnd(p.rate_gio_bien) + ' đ/h',
+        'Khung lõi 00–04', hrs(s.gioLoi) + '  ×  ' + vnd(p.rate_gio_loi) + ' đ/h'
+      ]);
+      basis.push([
+        'BCA Spark', s.spark + ' ca  ×  ' + vnd(p.bca_spark) + ' đ',
+        'BCA Blaze', s.blaze + ' ca  ×  ' + vnd(p.bca_blaze) + ' đ'
+      ]);
+    }
+    if (s.chuyenOPS) {
+      basis.push(['Tổng trọng lượng lô hàng', vnd(s.tongKG) + ' kg',
+        'Ngưỡng 1 người', vnd(p.ops_kg_1nguoi) + ' kg']);
+    }
+    if (s.caLe) {
+      basis.push(['Hệ số ngày lễ (giờ + BCA)', String(p.he_so_le || 1.5).replace('.', ',') + ' lần',
+        'Phụ trội lễ mỗi chuyến OPS', vnd(p.ops_phu_troi_le) + ' đ']);
+    }
+    basis.push(['Cách tính thuế TNCN', person.cachTinhThue || '—',
+      'Người phụ thuộc khai báo', person.staff ? String(num(person.staff.So_Phu_Thuoc)) : '—']);
+
+    doc.autoTable({
+      startY: y,
+      margin: { left: M, right: M },
+      body: basis,
+      theme: 'grid',
+      styles: { font: 'Montserrat', fontSize: 8.5, cellPadding: { top: 1.6, bottom: 1.6, left: 3, right: 3 }, textColor: INK, lineColor: LINE, lineWidth: 0.1 },
+      columnStyles: {
+        0: { cellWidth: 45, textColor: MUTE },
+        1: { halign: 'right', fontStyle: 'bold' },
+        2: { cellWidth: 45, textColor: MUTE },
+        3: { halign: 'right', fontStyle: 'bold' }
+      }
+    });
+    y = doc.lastAutoTable.finalY + 8;
+
+    /* ---- nhật ký ca ---- */
+    const list = person.shifts || [];
+    if (list.length) {
+      if (y > 225) { doc.addPage(); y = 20; }
+      doc.setTextColor.apply(doc, PURPLE); doc.setFont('Quicksand', 'bold'); doc.setFontSize(9);
+      doc.text('NHẬT KÝ CA  (' + list.length + ' ca)', M, y);
+      doc.setFont('Montserrat', 'normal'); doc.setFontSize(7.5); doc.setTextColor.apply(doc, MUTE);
+      doc.text('Đối chiếu xem đã đủ ca chưa. Thiếu ca — báo FIN trước hạn chốt bảng lương.', M, y + 4);
+      y += 7;
+
+      doc.autoTable({
+        startY: y,
+        margin: { left: M, right: M },
+        head: [['#', 'Ngày', 'Loại ca', 'Loại ngày', 'Giờ', 'Biên', 'Lõi', 'BCA', 'Mã job', 'KG', 'Thành tiền']],
+        body: list.map(function (x, i) {
+          const gio = x.gioBatDau + (x.gioKetThuc ? '–' + x.gioKetThuc : '');
+          return [
+            i + 1, dmy(x.ngay),
+            x.loaiCa === 'OPS' ? 'OPS' : 'Trực đêm',
+            x.loaiNgay || '', gio,
+            x.gioBien ? hrs(x.gioBien) : '', x.gioLoi ? hrs(x.gioLoi) : '',
+            x.mucBCA || '', x.maJob || '',
+            x.trongLuong ? vnd(x.trongLuong) : '',
+            vnd(x.tongDong)
+          ];
+        }),
+        foot: [['', '', '', '', 'TỔNG ' + list.length + ' ca', hrs(s.gioBien), hrs(s.gioLoi),
+          '', '', '', vnd(s.tong)]],
+        styles: { font: 'Montserrat', fontSize: 6.8, cellPadding: { top: 1.2, bottom: 1.2, left: 1.6, right: 1.6 }, textColor: INK, lineColor: LINE, lineWidth: 0.1, overflow: 'ellipsize' },
+        headStyles: { font: 'Quicksand', fontStyle: 'bold', fontSize: 6.4, fillColor: PURPLE, textColor: [255, 255, 255] },
+        footStyles: { font: 'Montserrat', fontStyle: 'bold', fontSize: 6.8, fillColor: SOFT, textColor: INK },
+        alternateRowStyles: { fillColor: [251, 250, 253] },
+        columnStyles: {
+          0: { cellWidth: 7, halign: 'right', cellPadding: { left: 0.4, right: 0.6 } },
+          1: { cellWidth: 18, halign: 'center' },
+          2: { cellWidth: 16, halign: 'center' },
+          3: { cellWidth: 16, halign: 'center' },
+          4: { cellWidth: 21, halign: 'center' },
+          5: { cellWidth: 11, halign: 'right' },
+          6: { cellWidth: 11, halign: 'right' },
+          7: { cellWidth: 13, halign: 'center' },
+          8: { cellWidth: 'auto' },
+          9: { cellWidth: 11, halign: 'right' },
+          10: { cellWidth: 22, halign: 'right', fontStyle: 'bold' }
+        },
+        didParseCell: function (d) {
+          if (d.section !== 'body') return;
+          if (d.column.index === 3 && d.cell.raw === 'Lễ') {
+            d.cell.styles.textColor = ORANGE; d.cell.styles.fontStyle = 'bold';
+          }
+          if (d.column.index === 7 && d.cell.raw === 'Blaze') {
+            d.cell.styles.textColor = PURPLE; d.cell.styles.fontStyle = 'bold';
+          }
+          if (d.column.index === 2 && d.cell.raw === 'OPS') {
+            d.cell.styles.textColor = GREEN; d.cell.styles.fontStyle = 'bold';
+          }
+        }
+      });
+      y = doc.lastAutoTable.finalY + 5;
+
+      doc.setFontSize(7.5); doc.setTextColor.apply(doc, MUTE); doc.setFont('Montserrat', 'normal');
+      doc.text('Trực đêm: ' + vnd(s.pcTrucDem) + ' đ   ·   OPS: ' + vnd(s.phiOPS) + ' đ', M, y);
+    } else {
+      doc.setFontSize(7.8); doc.setTextColor.apply(doc, MUTE);
+      doc.text('Kỳ này không có ca trực đêm hoặc chuyến OPS nào được ghi nhận.', M, y);
+    }
+
+    /* ---- chân trang ---- */
+    const pages = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pages; i++) {
+      doc.setPage(i);
+      const H = doc.internal.pageSize.getHeight();
+      doc.setDrawColor.apply(doc, LINE); doc.setLineWidth(0.2);
+      doc.line(M, H - 14, W - M, H - 14);
+      doc.setFont('Montserrat', 'normal'); doc.setFontSize(6.8); doc.setTextColor.apply(doc, MUTE);
+      doc.text('Số liệu lấy trực tiếp từ file Excel phụ cấp kỳ ' + (report.period.name || '') +
+        '. Chi tiết công thức: liên hệ phòng FIN.', M, H - 9);
+      doc.text('Xuất ' + dmy(new Date()) + '  ·  Trang ' + i + '/' + pages, W - M, H - 9, { align: 'right' });
+    }
+
+    return doc;
+  }
+
+  function fileName(report, person) {
+    const q = String(report.period.name || 'PhuCap').replace(/[\\/:*?"<>|]/g, '-');
+    const nm = String(person.hoTen || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .replace(/đ/g, 'd').replace(/Đ/g, 'D').replace(/\s+/g, '-');
+    return 'Phieu-PhuCap_' + q + '_' + person.maNV + '_' + nm + '.pdf';
+  }
+
+  return { build: build, fileName: fileName, vnd: vnd, hrs: hrs };
+});
+</script>
+<script>/* ==========================================================================
    INCAL UI — điều khiển giao diện công cụ phiếu incentive.
    Phụ thuộc: XLSX (SheetJS), jspdf, jspdf-autotable, JSZip, IncalCore, IncalPayslip.
    ========================================================================== */
@@ -1391,10 +1981,17 @@ https://github.com/nodeca/pako/blob/main/LICENSE
   const $ = function (s) { return document.querySelector(s); };
   const $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
   const P = window.IncalPayslip, C = window.IncalCore;
+  const B = window.IncalBonus, BS = window.IncalBonusSlip;
   const vnd = P.vnd;
+  const hrs = BS.hrs;
   const GROUP = { SALE: ['Sale COM', ''], KAE: ['KAE', 'kae'], BO: ['BO', 'bo'] };
+  const BGROUP = { TRUC_DEM: ['Trực đêm', 'night'], OPS: ['OPS', 'ops'] };
 
-  const state = { report: null, reports: [], logo: null, fonts: null };
+  const state = {
+    report: null, reports: [],
+    bonus: null, bonusReports: [],
+    logo: null, fonts: null
+  };
 
   function esc(s) {
     return String(s === undefined || s === null ? '' : s)
@@ -1419,14 +2016,27 @@ https://github.com/nodeca/pako/blob/main/LICENSE
 
   /* ------------------------------------------------------------------ đọc file */
 
-  function readFile(file) {
+  /* Đọc file rồi tự phân loại: file phụ cấp hay file incentive. */
+  function readFile(file, want) {
     return new Promise(function (resolve, reject) {
       const fr = new FileReader();
       fr.onerror = function () { reject(new Error('Không đọc được file ' + file.name)); };
       fr.onload = function () {
         try {
           const wb = XLSX.read(new Uint8Array(fr.result), { type: 'array', cellFormula: true });
-          resolve(C.parse(wb, file.name));
+          const isBonus = B.looksLikeBonus(wb);
+          if (want === 'INCENTIVE' && isBonus) {
+            throw new Error('đây là file PHỤ CẤP. Hãy thả vào thẻ "2 Phiếu phụ cấp".');
+          }
+          if (want === 'BONUS' && !isBonus) {
+            throw new Error('đây là file INCENTIVE. Hãy thả vào thẻ "1 Phiếu incentive".');
+          }
+          if (isBonus) resolve(B.parse(wb, file.name));
+          else {
+            const rep = C.parse(wb, file.name);
+            rep.kind = 'INCENTIVE';
+            resolve(rep);
+          }
         } catch (e) { reject(new Error(file.name + ': ' + e.message)); }
       };
       fr.readAsArrayBuffer(file);
@@ -1438,7 +2048,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
   function loadSingle(files) {
     const f = Array.prototype.slice.call(files).filter(isXlsx)[0];
     if (!f) { toast('Hãy chọn file Excel (.xlsx)'); return; }
-    readFile(f).then(function (rep) {
+    readFile(f, 'INCENTIVE').then(function (rep) {
       state.report = rep;
       renderSlipTab();
       toast('Đã nạp ' + rep.people.length + ' người từ ' + f.name);
@@ -1503,6 +2113,209 @@ https://github.com/nodeca/pako/blob/main/LICENSE
   function m(label, value, accent) {
     return '<article class="metric' + (accent ? ' accent' : '') + '"><span>' + esc(label) +
       '</span><strong>' + esc(value) + '</strong></article>';
+  }
+
+  /* ------------------------------------------------------------------ thẻ Phụ cấp */
+
+  function loadBonus(files) {
+    const f = Array.prototype.slice.call(files).filter(isXlsx)[0];
+    if (!f) { toast('Hãy chọn file Excel (.xlsx)'); return; }
+    readFile(f, 'BONUS').then(function (rep) {
+      state.bonus = rep;
+      renderBonusTab();
+      toast('Đã nạp ' + rep.people.length + ' người, ' + rep.shifts.length + ' ca từ ' + f.name);
+    }).catch(function (e) { showBanner('#bonusBanner', 'err', 'Không nạp được file', [e.message]); });
+  }
+
+  function renderBonusTab() {
+    const r = state.bonus;
+    if (!r) return;
+    $('#bonusEmpty').style.display = 'none';
+    $('#bonusContent').style.display = 'block';
+    $('#periodChip').innerHTML = '<small>KỲ BÁO CÁO</small><b>' + esc(r.period.name) + '</b>';
+    $('#dropBonus').classList.add('compact');
+
+    const blocking = r.warnings.filter(function (w) { return /^CHẶN/.test(w); });
+    if (blocking.length) showBanner('#bonusBanner', 'err', 'File chưa dùng được', r.warnings);
+    else if (r.warnings.length) showBanner('#bonusBanner', 'warn', 'Đã nạp, có điểm cần kiểm tra', r.warnings);
+    else showBanner('#bonusBanner', 'ok', 'Số liệu đọc từ file khớp nhật ký ca. Không phát hiện sai lệch.',
+      ['Nguồn: ' + r.fileName + '  ·  ' + r.people.length + ' người  ·  ' + r.shifts.length + ' ca.']);
+
+    const t = r.totals;
+    $('#bonusMetrics').innerHTML = [
+      m('KỲ', r.period.name),
+      m('SỐ NGƯỜI CÓ PHỤ CẤP', r.people.filter(function (p) { return p.Tong_PC_Gross > 0; }).length),
+      m('CA TRỰC · CHUYẾN OPS', t.So_Ca_Truc + ' · ' + t.So_Chuyen_OPS),
+      m('TỔNG TRỰC ĐÊM', short(t.PC_TrucDem)),
+      m('TỔNG OPS', short(t.Phi_OPS)),
+      m('TỔNG THỰC NHẬN', short(t.PC_Thuc_Nhan), true)
+    ].join('');
+
+    $('#bonusBody').innerHTML = r.people.map(function (p, i) {
+      const zero = p.Tong_PC_Gross === 0;
+      return '<tr' + (zero ? ' class="zero-row"' : '') + '>' +
+        '<td>' + (i + 1) + '</td>' +
+        '<td><code>' + esc(p.maNV) + '</code></td>' +
+        '<td><strong>' + esc(p.hoTen) + '</strong></td>' +
+        '<td>' + (p.groups.map(function (g) {
+          return '<span class="pill ' + (BGROUP[g] ? BGROUP[g][1] : '') + '">' +
+            (BGROUP[g] ? BGROUP[g][0] : g) + '</span>';
+        }).join(' ') || '—') + '</td>' +
+        '<td class="num">' + (p.So_Ca_Truc || 0) + ' · ' + (p.So_Chuyen_OPS || 0) + '</td>' +
+        '<td class="num">' + vnd(p.PC_TrucDem) + '</td>' +
+        '<td class="num">' + vnd(p.Phi_OPS) + '</td>' +
+        '<td class="num">' + vnd(p.Tong_PC_Gross) + '</td>' +
+        '<td class="num">' + vnd(p.Thue_TNCN) + '</td>' +
+        '<td class="num"><strong>' + vnd(p.PC_Thuc_Nhan) + '</strong></td>' +
+        '<td><button class="btn sm" data-bslip="' + i + '">Xem phiếu</button></td></tr>';
+    }).join('');
+
+    $('#bonusFoot').innerHTML = '<tr><td colspan="4">TỔNG ' + r.people.length + ' người</td>' +
+      '<td class="num">' + t.So_Ca_Truc + ' · ' + t.So_Chuyen_OPS + '</td>' +
+      '<td class="num">' + vnd(t.PC_TrucDem) + '</td>' +
+      '<td class="num">' + vnd(t.Phi_OPS) + '</td>' +
+      '<td class="num">' + vnd(t.Tong_PC_Gross) + '</td>' +
+      '<td class="num">' + vnd(t.Thue_TNCN) + '</td>' +
+      '<td class="num">' + vnd(t.PC_Thuc_Nhan) + '</td><td></td></tr>';
+
+    $('#bonusCount').textContent = r.shifts.length + ' ca';
+    $$('#bonusContent .bar .btn').forEach(function (b) { b.disabled = !!blocking.length; });
+  }
+
+  function bonusSlipHtml(r, p) {
+    const s = p.shiftSummary;
+    const rows = [
+      ['Phụ cấp theo giờ (' + hrs(s.gioBien) + ' biên + ' + hrs(s.gioLoi) + ' lõi)', s.pcGio],
+      ['Thưởng BCA (' + s.spark + ' Spark, ' + s.blaze + ' Blaze)', s.thuongBCA],
+      ['Phụ cấp trực đêm', p.PC_TrucDem, 'sub'],
+      ['Phụ cấp OPS (' + p.So_Chuyen_OPS + ' chuyến)', p.Phi_OPS],
+      ['Tổng phụ cấp (gross)', p.Tong_PC_Gross, 'strong'],
+      ['Bảo hiểm xã hội', -Math.abs(p.BHXH)],
+      ['Giảm trừ gia cảnh áp dụng', -Math.abs(p.Giam_Tru_Ap_Dung)],
+      ['Thu nhập chịu thuế', p.TN_Chiu_Thue, 'sub'],
+      ['Thuế TNCN (' + (p.cachTinhThue || '—') + ')', -Math.abs(p.Thue_TNCN), 'sub'],
+      ['Cộng / trừ khác', p.Cong_Tru_Khac]
+    ].filter(function (x) { return x[1] !== 0 || x[2]; });
+
+    const pa = r.params || {};
+    const basis = [
+      ['Số ca trực đêm', String(s.caTruc)],
+      ['Số chuyến OPS', String(s.chuyenOPS)],
+      ['Ca / chuyến ngày lễ', String(s.caLe)],
+      ['Tổng giờ trực', hrs(s.tongGio)]
+    ];
+    if (s.caTruc) {
+      basis.push(['Khung biên 22–24 & 04–06', hrs(s.gioBien) + ' × ' + vnd(pa.rate_gio_bien) + ' đ/h']);
+      basis.push(['Khung lõi 00–04', hrs(s.gioLoi) + ' × ' + vnd(pa.rate_gio_loi) + ' đ/h']);
+      basis.push(['BCA Spark', s.spark + ' ca × ' + vnd(pa.bca_spark) + ' đ']);
+      basis.push(['BCA Blaze', s.blaze + ' ca × ' + vnd(pa.bca_blaze) + ' đ']);
+    }
+    if (s.chuyenOPS) {
+      basis.push(['Tổng trọng lượng lô hàng', vnd(s.tongKG) + ' kg']);
+      basis.push(['Ngưỡng định biên 1 người', vnd(pa.ops_kg_1nguoi) + ' kg']);
+    }
+    if (s.caLe) {
+      basis.push(['Hệ số ngày lễ', String(pa.he_so_le || 1.5).replace('.', ',') + ' lần']);
+      basis.push(['Phụ trội lễ / chuyến OPS', vnd(pa.ops_phu_troi_le) + ' đ']);
+    }
+    basis.push(['Cách tính thuế TNCN', p.cachTinhThue || '—']);
+
+    const log = p.shifts.length ? (
+      '<h3>NHẬT KÝ CA (' + p.shifts.length + ' ca)</h3>' +
+      '<p class="deal-hint">Đối chiếu xem đã đủ ca chưa. Thiếu ca — báo FIN trước hạn chốt bảng lương.</p>' +
+      '<table class="slip-t"><thead><tr><th>#</th><th>Ngày</th><th>Loại ca</th><th>Loại ngày</th><th>Giờ</th>' +
+      '<th class="num">Biên</th><th class="num">Lõi</th><th>BCA</th><th>Mã job</th>' +
+      '<th class="num">KG</th><th class="num">Thành tiền</th></tr></thead><tbody>' +
+      p.shifts.map(function (x, i) {
+        const gio = x.gioBatDau + (x.gioKetThuc ? '–' + x.gioKetThuc : '');
+        return '<tr><td>' + (i + 1) + '</td><td>' + esc(B.fmtDate(x.ngay)) + '</td>' +
+          '<td>' + (x.loaiCa === 'OPS' ? 'OPS' : 'Trực đêm') + '</td>' +
+          '<td' + (x.loaiNgay === 'Lễ' ? ' class="tag-unpaid"' : '') + '>' + esc(x.loaiNgay) + '</td>' +
+          '<td>' + esc(gio) + '</td>' +
+          '<td class="num">' + (x.gioBien ? hrs(x.gioBien) : '') + '</td>' +
+          '<td class="num">' + (x.gioLoi ? hrs(x.gioLoi) : '') + '</td>' +
+          '<td>' + esc(x.mucBCA) + '</td><td><code>' + esc(x.maJob) + '</code></td>' +
+          '<td class="num">' + (x.trongLuong ? vnd(x.trongLuong) : '') + '</td>' +
+          '<td class="num">' + vnd(x.tongDong) + '</td></tr>';
+      }).join('') +
+      '</tbody><tfoot><tr class="sub"><td colspan="5">TỔNG ' + p.shifts.length + ' ca</td>' +
+      '<td class="num">' + hrs(s.gioBien) + '</td><td class="num">' + hrs(s.gioLoi) + '</td>' +
+      '<td></td><td></td><td></td><td class="num">' + vnd(s.tong) + '</td></tr></tfoot></table>' +
+      '<p class="deal-hint" style="margin-top:8px">Trực đêm: <b>' + vnd(s.pcTrucDem) +
+      ' đ</b> · OPS: <b>' + vnd(s.phiOPS) + ' đ</b></p>'
+    ) : '<p class="deal-hint">Kỳ này không có ca trực đêm hoặc chuyến OPS nào được ghi nhận.</p>';
+
+    const range = r.period.from && r.period.to ? dmy(r.period.from) + ' — ' + dmy(r.period.to) : '';
+
+    return '<article class="slip" data-person="' + esc(p.maNV) + '">' +
+      '<div class="slip-top">' + (state.logo ? '<img src="' + state.logo + '" alt="Trustana">' : '<strong>TRUSTANA</strong>') +
+      '<div class="r"><h2>PHIẾU PHỤ CẤP</h2><small>Trực đêm &amp; OPS · ' + esc(r.period.name) +
+      (range ? ' · ' + range : '') + '</small></div></div>' +
+      '<div class="slip-id"><div><span>HỌ VÀ TÊN</span><b>' + esc(p.hoTen) + '</b></div>' +
+      '<div><span>MÃ NHÂN VIÊN</span><b>' + esc(p.maNV) + '</b></div>' +
+      '<div><span>KHOẢN HƯỞNG</span><b>' + (p.groups.map(function (g) {
+        return BGROUP[g] ? BGROUP[g][0] : g;
+      }).join(' + ') || '—') + '</b></div></div>' +
+      '<table class="slip-t"><thead><tr><th>DIỄN GIẢI</th><th class="num">SỐ TIỀN (VND)</th></tr></thead><tbody>' +
+      rows.map(function (x) {
+        return '<tr class="' + (x[2] || '') + '"><td>' + esc(x[0]) + '</td><td class="num">' + vnd(x[1]) + '</td></tr>';
+      }).join('') + '</tbody></table>' +
+      '<div class="slip-net"><span>PHỤ CẤP THỰC NHẬN</span><b>' + vnd(p.PC_Thuc_Nhan) + ' đ</b></div>' +
+      '<h3>CƠ SỞ TÍNH</h3><div class="basis">' + basis.map(function (b) {
+        return '<div><span>' + esc(b[0]) + '</span><b>' + esc(b[1]) + '</b></div>';
+      }).join('') + '</div>' +
+      log +
+      '<p class="slip-note">Số liệu lấy trực tiếp từ file Excel phụ cấp kỳ ' + esc(r.period.name) +
+      '. Chi tiết công thức: liên hệ phòng FIN. · Xuất ' + dmy(new Date()) + '</p></article>';
+  }
+
+  function makeBonusPdf(p) {
+    return BS.build(window.jspdf.jsPDF, state.fonts, state.bonus, p,
+      { logo: state.logo, company: 'TRUSTANA' });
+  }
+
+  function downloadBonusZip() {
+    const r = state.bonus;
+    if (!r) return;
+    const btn = $('#btnBonusZip'); btn.disabled = true; const old = btn.textContent;
+    btn.textContent = 'Đang dựng…';
+    setTimeout(function () {
+      try {
+        const zip = new JSZip();
+        r.people.forEach(function (p) {
+          zip.file(BS.fileName(r, p), makeBonusPdf(p).output('arraybuffer'));
+        });
+        zip.generateAsync({ type: 'blob' }).then(function (blob) {
+          saveBlob(blob, 'Phieu-PhuCap_' + String(r.period.name).replace(/[\\/:*?"<>|]/g, '-') + '.zip');
+          toast('Đã tải ' + r.people.length + ' phiếu PDF trong 1 file nén');
+        }).catch(function (e) { toast('Lỗi nén file: ' + e.message, 4000); })
+          .then(function () { btn.disabled = false; btn.textContent = old; });
+      } catch (e) {
+        toast('Lỗi dựng PDF: ' + e.message, 4000); btn.disabled = false; btn.textContent = old;
+      }
+    }, 30);
+  }
+
+  function exportBonusCsv() {
+    const r = state.bonus;
+    const head = ['STT', 'Ma_NV', 'Ho_Ten', 'Bo_Phan', 'So_Ca_Truc', 'So_Chuyen_OPS',
+      'PC_TrucDem', 'Phi_OPS', 'Tong_PC_Gross', 'Cach_Tinh_Thue', 'Thue_TNCN', 'PC_Thuc_Nhan'];
+    const rows = r.people.map(function (p, i) {
+      return [i + 1, p.maNV, p.hoTen, p.boPhan, p.So_Ca_Truc, p.So_Chuyen_OPS,
+        p.PC_TrucDem, p.Phi_OPS, p.Tong_PC_Gross, p.cachTinhThue, p.Thue_TNCN, p.PC_Thuc_Nhan];
+    });
+    const csv = '﻿' + [head].concat(rows).map(function (r2) {
+      return r2.map(function (c) { return /[",;\n]/.test(String(c)) ? '"' + String(c).replace(/"/g, '""') + '"' : c; }).join(';');
+    }).join('\r\n');
+    saveBlob(new Blob([csv], { type: 'text/csv;charset=utf-8' }),
+      'PhuCap_' + String(r.period.name).replace(/[\\/:*?"<>|]/g, '-') + '.csv');
+  }
+
+  function printAllBonus() {
+    const r = state.bonus;
+    $('#printArea').innerHTML = r.people.map(function (p) { return bonusSlipHtml(r, p); }).join('');
+    document.body.classList.add('printing-all');
+    setTimeout(function () { window.print(); }, 60);
   }
 
   /* ------------------------------------------------------------------ phiếu HTML */
@@ -1664,28 +2477,39 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       const errs = res.filter(function (r) { return r.__err; }).map(function (r) { return r.__err; });
       const good = res.filter(function (r) { return !r.__err; });
       good.forEach(function (r) {
-        const i = state.reports.findIndex(function (x) { return x.period.name === r.period.name; });
-        if (i >= 0) state.reports[i] = r; else state.reports.push(r);
+        const bucket = r.kind === 'BONUS' ? state.bonusReports : state.reports;
+        const i = bucket.findIndex(function (x) { return x.period.name === r.period.name; });
+        if (i >= 0) bucket[i] = r; else bucket.push(r);
       });
-      state.reports.sort(function (a, b) {
+      const byDate = function (a, b) {
         const t = function (r) { return r.period.from ? r.period.from.getTime() : 0; };
         return t(a) - t(b) || String(a.period.name).localeCompare(String(b.period.name));
-      });
+      };
+      state.reports.sort(byDate);
+      state.bonusReports.sort(byDate);
+      const label = state.reports.map(function (r) { return r.period.name; })
+        .concat(state.bonusReports.map(function (r) { return r.period.name + ' (phụ cấp)'; }));
       if (errs.length) showBanner('#dashBanner', 'warn', 'Một số file không nạp được', errs);
-      else if (state.reports.length) showBanner('#dashBanner', 'ok',
-        'Đã nạp ' + state.reports.length + ' kỳ: ' + state.reports.map(function (r) { return r.period.name; }).join(', '), []);
+      else if (label.length) showBanner('#dashBanner', 'ok',
+        'Đã nạp ' + label.length + ' kỳ: ' + label.join(', '), []);
       renderDashboard();
     });
   }
 
   function renderDashboard() {
-    const rs = state.reports;
-    $('#dashEmpty').style.display = rs.length ? 'none' : 'block';
+    const rs = state.reports, bs = state.bonusReports;
+    const any = rs.length || bs.length;
+    $('#dashEmpty').style.display = any ? 'none' : 'block';
     $('#dashContent').style.display = rs.length ? 'block' : 'none';
+    $('#dashBonusContent').style.display = bs.length ? 'block' : 'none';
     $('#fileList').innerHTML = rs.map(function (r, i) {
       return '<span class="file-chip"><b>' + esc(r.period.name) + '</b> ' + esc(r.fileName) +
         '<button data-drop="' + i + '" title="Bỏ kỳ này">×</button></span>';
-    }).join('');
+    }).concat(bs.map(function (r, i) {
+      return '<span class="file-chip bonus"><b>' + esc(r.period.name) + '</b> ' + esc(r.fileName) +
+        '<button data-bdrop="' + i + '" title="Bỏ kỳ này">×</button></span>';
+    })).join('');
+    if (bs.length) renderBonusDashboard(bs);
     if (!rs.length) return;
 
     const sum = function (key) { return rs.reduce(function (a, r) { return a + r.totals[key]; }, 0); };
@@ -1729,6 +2553,52 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     $('#dashCount').textContent = people.length + ' người';
   }
 
+  function renderBonusDashboard(bs) {
+    const sum = function (key) { return bs.reduce(function (a, r) { return a + r.totals[key]; }, 0); };
+    $('#dashBonusMetrics').innerHTML = [
+      m('SỐ KỲ', bs.length),
+      m('CA TRỰC · CHUYẾN OPS', sum('So_Ca_Truc') + ' · ' + sum('So_Chuyen_OPS')),
+      m('TỔNG TRỰC ĐÊM', short(sum('PC_TrucDem'))),
+      m('TỔNG OPS', short(sum('Phi_OPS'))),
+      m('TỔNG THỰC NHẬN', short(sum('PC_Thuc_Nhan')), true)
+    ].join('');
+
+    const names = [];
+    const byPerson = {};
+    bs.forEach(function (r) {
+      r.people.forEach(function (p) {
+        const k = p.maNV || p.hoTen;
+        if (!byPerson[k]) { byPerson[k] = { maNV: p.maNV, hoTen: p.hoTen, per: {}, total: 0 }; names.push(k); }
+        byPerson[k].per[r.period.name] = (byPerson[k].per[r.period.name] || 0) + p.PC_Thuc_Nhan;
+        byPerson[k].total += p.PC_Thuc_Nhan;
+      });
+    });
+    const people = names.map(function (k) { return byPerson[k]; })
+      .sort(function (a, b) { return b.total - a.total; });
+
+    barChart($('#chartBonusPeriod'), bs.map(function (r) {
+      return { label: r.period.name, value: r.totals.PC_Thuc_Nhan };
+    }));
+    stackedChart($('#chartBonusSplit'), bs.map(function (r) { return r.period.name; }), [
+      { label: 'Trực đêm', color: '#4d148c', values: bs.map(function (r) { return r.totals.PC_TrucDem; }) },
+      { label: 'OPS', color: '#147a50', values: bs.map(function (r) { return r.totals.Phi_OPS; }) }
+    ]);
+
+    $('#dashBonusHead').innerHTML = '<tr><th>#</th><th>Mã NV</th><th>Họ tên</th>' +
+      bs.map(function (r) { return '<th class="num">' + esc(r.period.name) + '</th>'; }).join('') +
+      '<th class="num">Cộng dồn</th></tr>';
+    $('#dashBonusBody').innerHTML = people.map(function (p, i) {
+      return '<tr><td>' + (i + 1) + '</td><td><code>' + esc(p.maNV) + '</code></td>' +
+        '<td><strong>' + esc(p.hoTen) + '</strong></td>' +
+        bs.map(function (r) { return '<td class="num">' + vnd(p.per[r.period.name] || 0) + '</td>'; }).join('') +
+        '<td class="num"><strong>' + vnd(p.total) + '</strong></td></tr>';
+    }).join('');
+    $('#dashBonusFoot').innerHTML = '<tr><td colspan="3">TỔNG ' + people.length + ' người</td>' +
+      bs.map(function (r) { return '<td class="num">' + vnd(r.totals.PC_Thuc_Nhan) + '</td>'; }).join('') +
+      '<td class="num">' + vnd(sum('PC_Thuc_Nhan')) + '</td></tr>';
+    $('#dashBonusCount').textContent = people.length + ' người';
+  }
+
   /* ------------------------------------------------------------------ vẽ biểu đồ */
 
   function setupCanvas(cv, h) {
@@ -1770,6 +2640,40 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       g.fillText(d.label, x + bw / 2, h - pad.b + 15);
     });
   }
+  /* Cột chồng: mỗi kỳ một cột, các lớp xếp lên nhau. */
+  function stackedChart(cv, periods, series) {
+    const { g, w, h } = setupCanvas(cv, 260);
+    if (!periods.length) return;
+    const pad = { l: 54, r: 10, t: 12, b: 28 };
+    const totals = periods.map(function (_, i) {
+      return series.reduce(function (a, s) { return a + (s.values[i] || 0); }, 0);
+    });
+    const max = Math.max.apply(null, totals) * 1.15 || 1;
+    axis(g, w, h, pad, max);
+    const iw = (w - pad.l - pad.r) / periods.length;
+    periods.forEach(function (q, i) {
+      const bw = Math.min(iw * .55, 64);
+      const x = pad.l + iw * i + (iw - bw) / 2;
+      let base = h - pad.b;
+      series.forEach(function (s) {
+        const v = s.values[i] || 0;
+        if (v <= 0) return;
+        const bh = (h - pad.t - pad.b) * (v / max);
+        g.fillStyle = s.color;
+        roundRect(g, x, base - bh, bw, bh, 3); g.fill();
+        base -= bh;
+      });
+      g.fillStyle = '#201c28'; g.textAlign = 'center';
+      g.font = 'bold 11px ' + getComputedStyle(document.body).fontFamily;
+      g.fillText(short(totals[i]), x + bw / 2, base - 6);
+      g.fillStyle = '#787286'; g.font = '11px ' + getComputedStyle(document.body).fontFamily;
+      g.fillText(q, x + bw / 2, h - pad.b + 15);
+    });
+    cv.parentElement.querySelector('.legend').innerHTML = series.map(function (s) {
+      return '<span><i style="background:' + s.color + '"></i>' + esc(s.label) + '</span>';
+    }).join('');
+  }
+
   const PALETTE = ['#4d148c', '#ff6200', '#1a5fb4', '#0f7b4f', '#9a6300', '#b42318', '#6b2bb0', '#00857a'];
   function groupedChart(cv, periods, people) {
     const { g, w, h } = setupCanvas(cv, 260);
@@ -1833,12 +2737,18 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         $$('.tab').forEach(function (x) { x.classList.remove('active'); });
         $$('.panel').forEach(function (x) { x.classList.remove('active'); });
         t.classList.add('active');
-        $('#panel-' + t.dataset.tab).classList.add('active');
-        if (t.dataset.tab === 'dash' && state.reports.length) renderDashboard();
+        const which = t.dataset.tab;
+        $('#panel-' + which).classList.add('active');
+        if (which === 'dash' && (state.reports.length || state.bonusReports.length)) renderDashboard();
+        /* Chip kỳ báo cáo bám theo thẻ đang mở, tránh hiển thị nhầm kỳ của thẻ kia. */
+        const cur = which === 'bonus' ? state.bonus : which === 'slip' ? state.report : null;
+        $('#periodChip').innerHTML = '<small>KỲ BÁO CÁO</small><b>' +
+          esc(cur ? cur.period.name : '—') + '</b>';
       });
     });
 
     bindDrop($('#dropSlip'), $('#fileSlip'), loadSingle);
+    bindDrop($('#dropBonus'), $('#fileBonus'), loadBonus);
     bindDrop($('#dropDash'), $('#fileDash'), loadMulti);
 
     $('#peopleBody').addEventListener('click', function (e) {
@@ -1847,11 +2757,27 @@ https://github.com/nodeca/pako/blob/main/LICENSE
       $('#dlgTitle').textContent = 'Phiếu incentive · ' + p.hoTen;
       $('#dlgBody').innerHTML = slipHtml(state.report, p);
       $('#dlg').dataset.person = b.dataset.slip;
+      $('#dlg').dataset.kind = 'INCENTIVE';
+      $('#dlg').showModal();
+    });
+    $('#bonusBody').addEventListener('click', function (e) {
+      const b = e.target.closest('[data-bslip]'); if (!b) return;
+      const p = state.bonus.people[+b.dataset.bslip];
+      $('#dlgTitle').textContent = 'Phiếu phụ cấp · ' + p.hoTen;
+      $('#dlgBody').innerHTML = bonusSlipHtml(state.bonus, p);
+      $('#dlg').dataset.person = b.dataset.bslip;
+      $('#dlg').dataset.kind = 'BONUS';
       $('#dlg').showModal();
     });
     $('#dlgClose').addEventListener('click', function () { $('#dlg').close(); });
     $('#dlgPdf').addEventListener('click', function () {
-      downloadOne(state.report.people[+$('#dlg').dataset.person]);
+      const dlg = $('#dlg'), i = +dlg.dataset.person;
+      if (dlg.dataset.kind === 'BONUS') {
+        const p = state.bonus.people[i];
+        makeBonusPdf(p).save(BS.fileName(state.bonus, p));
+      } else {
+        downloadOne(state.report.people[i]);
+      }
     });
     $('#dlgPrint').addEventListener('click', function () {
       document.body.classList.remove('printing-all'); window.print();
@@ -1860,10 +2786,15 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     $('#btnZip').addEventListener('click', downloadZip);
     $('#btnPrintAll').addEventListener('click', printAll);
     $('#btnCsv').addEventListener('click', exportCsv);
+    $('#btnBonusZip').addEventListener('click', downloadBonusZip);
+    $('#btnBonusPrintAll').addEventListener('click', printAllBonus);
+    $('#btnBonusCsv').addEventListener('click', exportBonusCsv);
 
     $('#fileList').addEventListener('click', function (e) {
-      const b = e.target.closest('[data-drop]'); if (!b) return;
-      state.reports.splice(+b.dataset.drop, 1); renderDashboard();
+      const b = e.target.closest('[data-drop]');
+      if (b) { state.reports.splice(+b.dataset.drop, 1); renderDashboard(); return; }
+      const c = e.target.closest('[data-bdrop]');
+      if (c) { state.bonusReports.splice(+c.dataset.bdrop, 1); renderDashboard(); }
     });
 
     window.addEventListener('afterprint', function () {
@@ -1871,7 +2802,9 @@ https://github.com/nodeca/pako/blob/main/LICENSE
     });
     window.addEventListener('resize', function () {
       clearTimeout(init._r);
-      init._r = setTimeout(function () { if (state.reports.length) renderDashboard(); }, 200);
+      init._r = setTimeout(function () {
+        if (state.reports.length || state.bonusReports.length) renderDashboard();
+      }, 200);
     });
   }
 

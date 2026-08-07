@@ -69,7 +69,7 @@ const H = require('./helpers.js');
   H.check('heading dùng lại tỷ lệ bản thẩm mỹ gốc', /\.page-head h1\{[^}]*font-size:clamp\(28px,3vw,42px\)[^}]*line-height:1\.08[^}]*letter-spacing:-\.025em[^}]*color:var\(--brand-deep\)/.test(css), 'true');
   H.check('PDF dùng Quicksand cho heading', /headStyles: \{ font: 'Quicksand'/.test(payslip), 'true');
   H.check('PDF dùng Montserrat cho nội dung', /styles: \{ font: 'Montserrat'/.test(payslip), 'true');
-  H.check('vùng thả file nhận focus bàn phím', (html.match(/class="drop"[^>]*tabindex="0"/g) || []).length, 2);
+  H.check('vùng thả file nhận focus bàn phím', (html.match(/class="drop"[^>]*tabindex="0"/g) || []).length, 3);
 
   console.log('\n== Lỗi trang ==');
   H.check('không có lỗi', t.errs.length, 0);

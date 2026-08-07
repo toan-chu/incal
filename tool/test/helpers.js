@@ -19,6 +19,19 @@ function skipNoMaster(what) {
   console.log('  hoặc chạy: INCAL_MASTER=/duong/dan/file.xlsx npm test');
 }
 
+/* File phụ cấp có số liệu thật. Cũng không nằm trong git. */
+function bonusMasterPath() {
+  const p = process.env.INCAL_BONUS_MASTER ||
+    path.join(ROOT, 'docs', '2026M08_PhuCap_MASTER.xlsx');
+  return fs.existsSync(p) ? p : null;
+}
+
+function skipNoBonusMaster(what) {
+  console.log('BỎ QUA ' + what + ': không tìm thấy file Excel phụ cấp có số liệu.');
+  console.log('  Đặt file vào ' + path.join(ROOT, 'docs', '2026M08_PhuCap_MASTER.xlsx'));
+  console.log('  hoặc chạy: INCAL_BONUS_MASTER=/duong/dan/file.xlsx node smoke-bonus.js');
+}
+
 /* Tạo bản sao của file gốc nhưng đổi nhãn kỳ — dùng để thử dashboard nhiều kỳ.
    Sửa thẳng trong gói zip nên giữ nguyên giá trị Excel đã lưu. */
 function cloneWithPeriod(srcPath, fromLabel, toLabel) {
@@ -119,5 +132,6 @@ function finish() {
 
 module.exports = {
   ROOT, HTML, TEMPLATE, masterPath, skipNoMaster,
+  bonusMasterPath, skipNoBonusMaster,
   cloneWithPeriod, cloneWithoutFormulaCache, openTool, wait, check, finish
 };

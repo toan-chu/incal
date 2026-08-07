@@ -117,6 +117,8 @@ table.data tfoot td{padding:10px 12px;font-weight:700;background:var(--brand-sof
   background:var(--brand-soft);color:var(--brand)}
 .pill.bo{background:var(--accent-soft);color:#b34500}
 .pill.kae{background:#eaf3ff;color:#1a5fb4}
+.pill.night{background:#efe9f7;color:var(--brand)}
+.pill.ops{background:var(--success-soft);color:var(--success)}
 .tag-unpaid{color:var(--accent);font-weight:700}
 .zero-row td{color:var(--mute)}
 
@@ -192,6 +194,9 @@ table.slip-t tr.strong td{font-weight:700}
 .file-chip b{color:var(--brand)}
 .file-chip button{border:0;background:var(--brand-soft);color:var(--brand);border-radius:50%;width:20px;height:20px;
   cursor:pointer;font-size:13px;line-height:1}
+.file-chip.bonus{border-color:#bfe3d3}
+.file-chip.bonus b{color:var(--success)}
+.file-chip.bonus button{background:var(--success-soft);color:var(--success)}
 
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;
   padding:10px 18px;border-radius:24px;font-size:13px;z-index:60;box-shadow:var(--shadow);opacity:0;

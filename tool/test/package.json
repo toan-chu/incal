@@ -3,8 +3,8 @@
   "private": true,
   "description": "Kiểm thử khói cho tool/Phieu-Incentive.html, chạy trong DOM giả lập.",
   "scripts": {
-    "test": "node smoke-happy.js && node smoke-guard.js",
-    "pdf-check": "node export-pdf-check.js"
+    "test": "node smoke-happy.js && node smoke-guard.js && node smoke-bonus.js",
+    "pdf-check": "node export-pdf-check.js && node export-pdf-bonus-check.js"
   },
   "devDependencies": {
     "adm-zip": "^0.6.0",

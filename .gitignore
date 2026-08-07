@@ -1,8 +1,18 @@
-# Dữ liệu kinh doanh theo kỳ — KHÔNG đẩy lên git
+# Dữ liệu kinh doanh theo kỳ — KHÔNG đẩy lên git.
+# Chỉ hai file mẫu RỖNG ở gốc repo được đẩy lên.
 *.xlsx
 *.xls
 !Incentive-Template-TRONG.xlsx
+!PhuCap-Template-TRONG.xlsx
 reports/*.json
+
+# Văn bản quy định nội bộ (nguồn của công thức) — giữ trên máy, không đẩy lên git
+*.docx
+*.doc
+
+# Ảnh chụp màn hình — không giữ trong repo
+docs/screenshots/
+*.screenshot.png
 
 # Thư mục tạm sinh ra khi kiểm thử — không đẩy lên git
 outputs/

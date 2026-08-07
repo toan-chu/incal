@@ -14,7 +14,8 @@
   <a class="brand" href="#"><img alt="Trustana"><span><strong>Incentive</strong><small>Phiếu &amp; Dashboard</small></span></a>
   <nav class="tabs">
     <button class="tab active" data-tab="slip"><i>1</i> Phiếu incentive</button>
-    <button class="tab" data-tab="dash"><i>2</i> Dashboard nhiều kỳ</button>
+    <button class="tab" data-tab="bonus"><i>2</i> Phiếu phụ cấp</button>
+    <button class="tab" data-tab="dash"><i>3</i> Dashboard nhiều kỳ</button>
   </nav>
   <span class="spacer"></span>
   <span class="period-chip" id="periodChip"><small>KỲ BÁO CÁO</small><b>—</b></span>
@@ -72,19 +73,69 @@
     </div>
   </section>
 
-  <!-- ================= THẺ 2 : DASHBOARD ================= -->
+  <!-- ================= THẺ 2 : PHỤ CẤP ================= -->
+  <section class="panel" id="panel-bonus">
+    <div class="page-head">
+      <p class="eyebrow">NGUỒN: FILE EXCEL PHỤ CẤP THEO THÁNG</p>
+      <h1>Phiếu phụ cấp trực đêm &amp; OPS</h1>
+      <p>Trực đêm 22:00–06:00 (phụ cấp theo giờ + thưởng BCA) và phụ cấp OPS tại sân bay / cảng / ga. Công cụ chỉ đọc số đã tính sẵn trong file Excel, không tính lại.</p>
+    </div>
+
+    <div class="drop" id="dropBonus" role="button" tabindex="0" aria-label="Chọn file Excel phụ cấp">
+      <div class="ico">☾</div>
+      <div>
+        <h3>Thả file Excel phụ cấp vào đây</h3>
+        <p>Hoặc bấm để chọn file .xlsx của một tháng</p>
+      </div>
+      <input type="file" id="fileBonus" accept=".xlsx,.xlsm">
+    </div>
+
+    <div class="banner" id="bonusBanner" style="display:none"></div>
+
+    <div class="empty card" id="bonusEmpty">
+      <strong>Chưa có dữ liệu</strong>
+      <span>Nạp file Excel phụ cấp để xem bảng chi và xuất phiếu.</span>
+    </div>
+
+    <div id="bonusContent" style="display:none">
+      <div class="metrics" id="bonusMetrics"></div>
+
+      <div class="card">
+        <div class="card-head"><h2>BẢNG CHI PHỤ CẤP</h2><b id="bonusCount"></b></div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead><tr>
+              <th>#</th><th>MÃ NV</th><th>HỌ TÊN</th><th>KHOẢN HƯỞNG</th>
+              <th class="num">CA · CHUYẾN</th><th class="num">TRỰC ĐÊM</th><th class="num">OPS</th>
+              <th class="num">GROSS</th><th class="num">THUẾ TNCN</th><th class="num">THỰC NHẬN</th><th></th>
+            </tr></thead>
+            <tbody id="bonusBody"></tbody>
+            <tfoot id="bonusFoot"></tfoot>
+          </table>
+        </div>
+        <div class="bar">
+          <span>XUẤT</span>
+          <button class="btn primary" id="btnBonusZip">Tải tất cả phiếu PDF (.zip)</button>
+          <button class="btn" id="btnBonusPrintAll">In tất cả phiếu</button>
+          <button class="btn ghost" id="btnBonusCsv">Bảng tổng hợp · CSV</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= THẺ 3 : DASHBOARD ================= -->
   <section class="panel" id="panel-dash">
     <div class="page-head">
       <p class="eyebrow">NHIỀU KỲ · XU HƯỚNG</p>
       <h1>Dashboard tổng hợp</h1>
-      <p>Thả nhiều file Excel của các quý khác nhau. Công cụ tự nhận kỳ từ tham số trong file, không cần đặt tên theo quy ước.</p>
+      <p>Thả nhiều file Excel của các kỳ khác nhau — incentive theo quý và phụ cấp theo tháng đều nhận. Công cụ tự phân loại và tự nhận kỳ từ tham số trong file, không cần đặt tên theo quy ước.</p>
     </div>
 
-    <div class="drop" id="dropDash" role="button" tabindex="0" aria-label="Chọn nhiều file Excel incentive">
+    <div class="drop" id="dropDash" role="button" tabindex="0" aria-label="Chọn nhiều file Excel">
       <div class="ico">▦</div>
       <div>
         <h3>Thả nhiều file Excel vào đây</h3>
-        <p>Chọn được nhiều file cùng lúc · nạp thêm file sau vẫn giữ các kỳ đã có</p>
+        <p>Incentive · phụ cấp · chọn nhiều file cùng lúc · nạp thêm file sau vẫn giữ các kỳ đã có</p>
       </div>
       <input type="file" id="fileDash" accept=".xlsx,.xlsm" multiple>
     </div>
@@ -98,6 +149,7 @@
     </div>
 
     <div id="dashContent" style="display:none">
+      <p class="eyebrow" style="margin:0 0 10px">INCENTIVE</p>
       <div class="metrics" id="dashMetrics"></div>
 
       <div class="charts">
@@ -120,6 +172,35 @@
             <thead id="dashHead"></thead>
             <tbody id="dashBody"></tbody>
             <tfoot id="dashFoot"></tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="dashBonusContent" style="display:none">
+      <p class="eyebrow" style="margin:26px 0 10px">PHỤ CẤP TRỰC ĐÊM &amp; OPS</p>
+      <div class="metrics" id="dashBonusMetrics"></div>
+
+      <div class="charts">
+        <article class="card chart-box">
+          <div class="card-head" style="padding:0 0 10px;border:0"><h2>TỔNG PHỤ CẤP THỰC NHẬN THEO KỲ</h2></div>
+          <canvas id="chartBonusPeriod"></canvas>
+          <div class="legend"></div>
+        </article>
+        <article class="card chart-box">
+          <div class="card-head" style="padding:0 0 10px;border:0"><h2>TỶ TRỌNG TRỰC ĐÊM · OPS THEO KỲ</h2></div>
+          <canvas id="chartBonusSplit"></canvas>
+          <div class="legend"></div>
+        </article>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>CHI TIẾT PHỤ CẤP THEO NGƯỜI</h2><b id="dashBonusCount"></b></div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead id="dashBonusHead"></thead>
+            <tbody id="dashBonusBody"></tbody>
+            <tfoot id="dashBonusFoot"></tfoot>
           </table>
         </div>
       </div>
@@ -147,7 +228,9 @@
 <script>/*__AUTOTABLE__*/</script>
 <script>/*__JSZIP__*/</script>
 <script>/*__CORE__*/</script>
+<script>/*__BONUS__*/</script>
 <script>/*__PAYSLIP__*/</script>
+<script>/*__BONUSSLIP__*/</script>
 <script>/*__UI__*/</script>
 <script>
 window.IncalUI.init({

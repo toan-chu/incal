@@ -2,13 +2,16 @@
 
 Bản đồ repo. Đọc file này trước khi bắt đầu bất kỳ việc gì.
 
-**Cập nhật:** 2026-08-06
+**Cập nhật:** 2026-08-07
 
 ---
 
 ## Repo này làm gì
 
-Đọc file Excel incentive của Trustana → xuất phiếu incentive PDF cho từng nhân viên, và dựng dashboard so sánh nhiều quý.
+Đọc file Excel của Trustana → xuất phiếu PDF cho từng nhân viên, và dựng dashboard so sánh nhiều kỳ. Hai loại:
+
+- **Incentive** theo quý — hoa hồng Sale COM / KAE / BO.
+- **Phụ cấp** theo tháng — trực đêm (giờ + thưởng BCA) và OPS sân bay / cảng / ga.
 
 **Nguyên tắc bất di bất dịch:** file Excel là nguồn chân lý duy nhất. Công cụ **không tính lại** bất kỳ công thức nào — chỉ đọc giá trị Excel đã lưu sẵn trong file `.xlsx` rồi trình bày lại.
 
@@ -18,11 +21,15 @@ Bản đồ repo. Đọc file này trước khi bắt đầu bất kỳ việc g
 
 | Đường dẫn | Nội dung |
 |---|---|
-| `Incentive-Template-TRONG.xlsx` | File mẫu rỗng: đủ công thức, đủ danh sách nhân sự, sạch dữ liệu giao dịch. Đây là file duy nhất được đẩy lên git. |
+| `Incentive-Template-TRONG.xlsx` | Mẫu rỗng incentive: đủ công thức, đủ danh sách nhân sự, sạch dữ liệu giao dịch. |
+| `PhuCap-Template-TRONG.xlsx` | Mẫu rỗng phụ cấp: 120 dòng ca trống đã cài sẵn công thức. |
+| `docs/BONUS_FORMULA_NOTES.md` | **Đọc trước khi chi phụ cấp.** Log 7 lỗi công thức của file gốc `tính phụ cấp.xlsx` đã sửa, và 3 điểm chờ FIN quyết. |
 | `tool/Phieu-Incentive.html` | **Sản phẩm.** Một file HTML tự chứa, mở bằng trình duyệt. Dựng ra từ `tool/src/`, KHÔNG sửa tay. |
 | `tool/build.py` | Đóng gói `tool/src/` thành một file HTML duy nhất. |
-| `tool/src/core.js` | Đọc workbook, dựng dữ liệu, kiểm tra file hợp lệ. |
-| `tool/src/payslip.js` | Dựng phiếu PDF (jsPDF + autoTable, nhúng font để hiện đúng tiếng Việt). |
+| `tool/src/core.js` | Đọc workbook incentive, dựng dữ liệu, kiểm tra file hợp lệ. |
+| `tool/src/bonus.js` | Đọc workbook phụ cấp, nhận diện loại file, đối chiếu nhật ký ca với bảng chi. |
+| `tool/src/payslip.js` | Dựng phiếu incentive PDF (jsPDF + autoTable, nhúng font để hiện đúng tiếng Việt). |
+| `tool/src/bonusslip.js` | Dựng phiếu phụ cấp PDF, cùng bộ font và bảng màu. |
 | `tool/src/ui.js` | Giao diện, biểu đồ canvas, xuất file. |
 | `tool/src/app.css` | Trình bày, gồm cả kiểu dành cho lệnh In. |
 | `tool/src/index.template.html` | Khung HTML có chỗ cắm `/*__TÊN__*/`. |
@@ -44,7 +51,7 @@ Bản đồ repo. Đọc file này trước khi bắt đầu bất kỳ việc g
 
 File có số liệu thật (`2026Q1_Incentive_MASTER.xlsx` và các kỳ sau) do người dùng giữ trên máy, `.gitignore` chặn mọi `.xlsx` trừ file mẫu rỗng.
 
-Kiểm thử tự tìm file thật theo thứ tự: biến môi trường `INCAL_MASTER` → `2026Q1_Incentive_MASTER.xlsx` ở gốc repo. Không thấy thì in "BỎ QUA" và thoát sạch, không báo lỗi giả.
+Kiểm thử tự tìm file thật theo thứ tự: `INCAL_MASTER` → `2026Q1_Incentive_MASTER.xlsx` ở gốc repo; `INCAL_BONUS_MASTER` → `docs/2026M08_PhuCap_MASTER.xlsx`. Không thấy thì in "BỎ QUA" và thoát sạch, không báo lỗi giả.
 
 ---
 
@@ -72,6 +79,21 @@ Bảng được tìm theo **tên tiêu đề**, không theo vị trí ô.
 | **Tổng Incentive Thực nhận** | **314.788.696** |
 | Người đầu bảng | Phạm Thị Thương Hoài — thực nhận 171.010.729, 159 deal |
 | Cộng dồn hai kỳ (kiểm thử dashboard) | 629.577.392 |
+
+## Số liệu chuẩn để đối chiếu (phụ cấp — kỳ mẫu Tháng 08/2026)
+
+| Chỉ số | Giá trị |
+|---|---|
+| Số người | 12 |
+| Ca trực đêm · chuyến OPS | 7 · 8 |
+| Tổng phụ cấp trực đêm | 2.310.000 |
+| Tổng phụ cấp OPS | 2.600.000 |
+| **Tổng gross** | **4.910.000** |
+| Ca 22:00–02:00 ngày thường | 2h biên + 2h lõi, Blaze — 360.000 |
+| Ca 00:00–02:00 ngày lễ | 2h lõi, Blaze — 450.000 |
+| Chuyến OPS 02:30 ngày lễ | 600.000 + 300.000 phụ trội = 900.000 |
+
+Ba số gross ở trên là **cố định**. Thuế TNCN và thực nhận **không chốt cứng** vì phụ thuộc cột `Dang_Ky_Giam_Tru` do FIN nhập tay — kiểm thử chỉ soát quan hệ `thực nhận = gross − thuế`.
 
 Bất kỳ thay đổi nào làm lệch các số này đều là lỗi.
 
