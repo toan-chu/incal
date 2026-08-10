@@ -3,10 +3,12 @@
    Cùng bộ font và bảng màu với phiếu incentive.
    ========================================================================== */
 (function (root, factory) {
-  if (typeof module === 'object' && module.exports) module.exports = factory();
-  else root.IncalBonusSlip = factory();
-})(typeof self !== 'undefined' ? self : this, function () {
+  if (typeof module === 'object' && module.exports) module.exports = factory(root);
+  else root.IncalBonusSlip = factory(root);
+})(typeof self !== 'undefined' ? self : this, function (root) {
   'use strict';
+
+  root = root || (typeof self !== 'undefined' ? self : {});
 
   const PURPLE = [77, 20, 140];
   const ORANGE = [255, 98, 0];
@@ -150,9 +152,11 @@
     basis.push(['Số ca trực đêm', String(s.caTruc), 'Số chuyến OPS', String(s.chuyenOPS)]);
     basis.push(['Ca / chuyến ngày lễ', String(s.caLe), 'Tổng giờ trực', hrs(s.tongGio)]);
     if (s.caTruc) {
+      const kh = (root.IncalBonus || {}).nhanKhung
+        ? root.IncalBonus.nhanKhung(p) : { bien: 'Khung biên', loi: 'Khung lõi' };
       basis.push([
-        'Khung biên 22–24 & 04–06', hrs(s.gioBien) + '  ×  ' + vnd(p.rate_gio_bien) + ' đ/h',
-        'Khung lõi 00–04', hrs(s.gioLoi) + '  ×  ' + vnd(p.rate_gio_loi) + ' đ/h'
+        kh.bien, hrs(s.gioBien) + '  ×  ' + vnd(p.rate_gio_bien) + ' đ/h',
+        kh.loi, hrs(s.gioLoi) + '  ×  ' + vnd(p.rate_gio_loi) + ' đ/h'
       ]);
       basis.push([
         'BCA Spark', s.spark + ' ca  ×  ' + vnd(p.bca_spark) + ' đ',

@@ -29,10 +29,10 @@ const H = require('./helpers.js');
      Thuế và thực nhận đổi theo cột đó nên chỉ kiểm tra quan hệ cộng trừ. */
   const foot = t.$('#bonusFoot').textContent.replace(/\s+/g, ' ');
   console.log('  dòng tổng: ' + foot);
-  H.check('tổng trực đêm 2.310.000', /2\.310\.000/.test(foot), 'true');
-  H.check('tổng OPS 2.600.000', /2\.600\.000/.test(foot), 'true');
-  H.check('tổng gross 4.910.000', /4\.910\.000/.test(foot), 'true');
-  H.check('tổng ca 7 trực · 8 chuyến', /7 · 8/.test(foot), 'true');
+  H.check('tổng trực đêm 3.172.500', /3\.172\.500/.test(foot), 'true');
+  H.check('tổng OPS 2.400.000', /2\.400\.000/.test(foot), 'true');
+  H.check('tổng gross 5.572.500', /5\.572\.500/.test(foot), 'true');
+  H.check('tổng ca 8 trực · 7 chuyến', /8 · 7/.test(foot), 'true');
 
   const cells = t.$$('#bonusFoot td').map(function (td) {
     return Number(String(td.textContent).replace(/\./g, '')) || 0;
@@ -48,12 +48,20 @@ const H = require('./helpers.js');
   t.$('[data-bslip="0"]').click();
   const slip = t.$('#dlgBody .slip');
   H.check('tiêu đề hộp thoại', /Phiếu phụ cấp · Phạm Thị Thương Hoài/.test(t.$('#dlgTitle').textContent), 'true');
-  H.check('gross 660.000 (2 ca Blaze)', /660\.000/.test(slip.textContent), 'true');
-  H.check('phụ cấp giờ 260.000', /260\.000/.test(slip.textContent), 'true');
+  H.check('gross 740.000 (2 ca 22:30–02:30)', /740\.000/.test(slip.textContent), 'true');
+  H.check('phụ cấp giờ 340.000', /340\.000/.test(slip.textContent), 'true');
   H.check('thưởng BCA 400.000', /400\.000/.test(slip.textContent), 'true');
   H.check('nhãn phiếu', slip.querySelector('.slip-top h2').textContent, 'PHIẾU PHỤ CẤP');
   H.check('số dòng nhật ký ca', slip.querySelectorAll('table.slip-t')[1].querySelectorAll('tbody tr').length, 2);
+  H.check('giờ lẻ hiện đúng', /22:30–02:30/.test(slip.textContent), 'true');
   H.check('có mục cơ sở tính', slip.querySelectorAll('.basis div').length > 6, 'true');
+
+  /* Nhãn khung giờ phải dựng từ tham số trong file, không viết cứng trong mã. */
+  const basisTxt = Array.prototype.map.call(slip.querySelectorAll('.basis div'), function (d) {
+    return d.textContent.replace(/\s+/g, ' ');
+  }).join(' | ');
+  H.check('nhãn khung biên đọc từ file', /Khung biên 22:00–00:00 & 04:00–06:00/.test(basisTxt), 'true');
+  H.check('nhãn khung lõi đọc từ file', /Khung lõi 00:00–04:00/.test(basisTxt), 'true');
   t.$('#dlgClose').click();
 
   console.log('\n== Phiếu người chỉ có OPS, ngày lễ (Phan Thị Kiều Trang) ==');

@@ -34,6 +34,7 @@
   }
 
   const NAMES = ['ky_ten', 'ky_bat_dau', 'ky_ket_thuc', 'loai_bang',
+    'gio_dem_bat_dau', 'gio_dem_ket_thuc', 'gio_loi_bat_dau', 'gio_loi_ket_thuc',
     'rate_gio_bien', 'rate_gio_loi', 'he_so_le', 'bca_spark', 'bca_blaze',
     'ops_0600_0800', 'ops_0800_1800', 'ops_1800_2200', 'ops_2200_0100',
     'ops_0100_0600', 'ops_phu_troi_le', 'ops_kg_1nguoi', 'ops_nguoi_toi_da',
@@ -216,8 +217,24 @@
     return s;
   }
 
+  /* Nhãn khung giờ dựng từ tham số trong file, KHÔNG viết cứng —
+     đổi chính sách trong Excel thì phiếu tự đổi theo. */
+  function nhanKhung(params) {
+    const p = params || {};
+    const d1 = hhmm(p.gio_dem_bat_dau), d2 = hhmm(p.gio_dem_ket_thuc);
+    const l1 = hhmm(p.gio_loi_bat_dau), l2 = hhmm(p.gio_loi_ket_thuc);
+    if (!d1 || !d2 || !l1 || !l2) return { bien: 'Khung biên', loi: 'Khung lõi' };
+    const doan = [];
+    if (d1 !== l1) doan.push(d1 + '–' + l1);
+    if (l2 !== d2) doan.push(l2 + '–' + d2);
+    return {
+      bien: 'Khung biên ' + (doan.join(' & ') || '—'),
+      loi: 'Khung lõi ' + l1 + '–' + l2
+    };
+  }
+
   return {
     parse: parse, looksLikeBonus: looksLikeBonus,
-    summarise: summarise, hhmm: hhmm, fmtDate: fmtDate
+    summarise: summarise, hhmm: hhmm, fmtDate: fmtDate, nhanKhung: nhanKhung
   };
 });

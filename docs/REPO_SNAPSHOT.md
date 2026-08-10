@@ -86,11 +86,13 @@ Bảng được tìm theo **tên tiêu đề**, không theo vị trí ô.
 |---|---|
 | Số người | 12 |
 | Ca trực đêm · chuyến OPS | 7 · 8 |
-| Tổng phụ cấp trực đêm | 2.310.000 |
-| Tổng phụ cấp OPS | 2.600.000 |
-| **Tổng gross** | **4.910.000** |
-| Ca 22:00–02:00 ngày thường | 2h biên + 2h lõi, Blaze — 360.000 |
-| Ca 00:00–02:00 ngày lễ | 2h lõi, Blaze — 450.000 |
+| Ca trực · chuyến OPS | 8 · 7 |
+| Tổng phụ cấp trực đêm | 3.172.500 |
+| Tổng phụ cấp OPS | 2.400.000 |
+| **Tổng gross** | **5.572.500** |
+| Ca 1 · 22:30–02:30 ngày thường | 1,5h biên + 2,5h lõi, Blaze — 370.000 |
+| Ca 2 · 02:30–06:30 ngày thường | 2h biên + 1,5h lõi, Blaze — 335.000 |
+| Ca 1 · 22:30–02:30 ngày lễ | 555.000 |
 | Chuyến OPS 02:30 ngày lễ | 600.000 + 300.000 phụ trội = 900.000 |
 
 Ba số gross ở trên là **cố định**. Thuế TNCN và thực nhận **không chốt cứng** vì phụ thuộc cột `Dang_Ky_Giam_Tru` do FIN nhập tay — kiểm thử chỉ soát quan hệ `thực nhận = gross − thuế`.

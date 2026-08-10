@@ -232,8 +232,9 @@
       ['Tổng giờ trực', hrs(s.tongGio)]
     ];
     if (s.caTruc) {
-      basis.push(['Khung biên 22–24 & 04–06', hrs(s.gioBien) + ' × ' + vnd(pa.rate_gio_bien) + ' đ/h']);
-      basis.push(['Khung lõi 00–04', hrs(s.gioLoi) + ' × ' + vnd(pa.rate_gio_loi) + ' đ/h']);
+      const kh = B.nhanKhung(pa);
+      basis.push([kh.bien, hrs(s.gioBien) + ' × ' + vnd(pa.rate_gio_bien) + ' đ/h']);
+      basis.push([kh.loi, hrs(s.gioLoi) + ' × ' + vnd(pa.rate_gio_loi) + ' đ/h']);
       basis.push(['BCA Spark', s.spark + ' ca × ' + vnd(pa.bca_spark) + ' đ']);
       basis.push(['BCA Blaze', s.blaze + ' ca × ' + vnd(pa.bca_blaze) + ' đ']);
     }

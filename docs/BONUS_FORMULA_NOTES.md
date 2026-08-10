@@ -24,6 +24,7 @@ File này ghi lại mọi chỗ file master mới **khác** file `tính phụ c�
 | 5 | `O20` | Bị đè bằng công thức của cột R → `SUM(N20:O20)` tự tham chiếu chính nó | Cột `Phi_OPS` có công thức riêng, đồng nhất mọi dòng | Vòng lặp; `O21:O27` không có công thức nào |
 | 6 | `S15:S27` | Thuế TNCN tính **trên từng ca** | Thuế tính một lần trên tổng phụ cấp cả tháng, ở sheet `Payout` | Sai bản chất thuế lũy tiến |
 | 7 | Toàn bộ | Mọi dòng ca đều được cộng phí OPS, kể cả ca trực đêm từ xa | Tách cột `Loai_Ca` = `TRUC_DEM` / `OPS` | **Thừa tiền.** Ca trực đêm cũ được cộng thêm 400.000–600.000đ dù không ra sân bay |
+| 8 | Cột `Gio_KT_Chuan` | Mốc chia ngày đặt ở 06:00, nên ca kết thúc **sau** 06:00 bị hiểu nhầm là 6h sáng cùng ngày — tức trước cả giờ vào ca | Mốc chia ngày thành tham số `moc_chia_ngay`, mặc định 12:00 | **Mất trắng cả ca.** Xem mục 2b |
 
 ---
 
@@ -56,6 +57,44 @@ Gio_Loi  = phần giao với [24,28]                             → đơn giá 
 | 22:00–06:00 | 4h | 4h | **320.000** |
 
 **Mức BCA:** chạm khung lõi → `Blaze`; chỉ chạm khung biên → `Spark`. Mỗi ca hưởng **một** mức, lấy mức cao nhất.
+
+---
+
+## 2b. Lỗi mất trắng ca 2 — và cách khung giờ được tham số hoá
+
+Lịch trực thực tế chia **hai ca một đêm cho hai người**: ca 1 từ 22:30 đến 02:30, ca 2 từ 02:30 đến 06:30. Ca 2 kết thúc **sau** mốc 06:00.
+
+Bản đầu tiên đặt mốc chia ngày đúng bằng 06:00: giờ nào ≤ 06:00 mới được hiểu là rạng sáng hôm sau. Ca 2 kết thúc 06:30 → 6,5 > 6 → hệ thống hiểu là **6h30 sáng cùng ngày**, tức trước cả giờ vào ca 02:30 → mọi phép giao khoảng ra âm → **0 đồng**.
+
+Chạy thử 3 đêm: ca 1 trả đủ, ca 2 ra 0. Quy ra tháng 30 đêm là **thiếu khoảng 10 triệu đồng**.
+
+**Cách sửa:** tách mốc chia ngày thành tham số `moc_chia_ngay`, mặc định **12** (12 giờ trưa). Giờ nào trước trưa đều được hiểu là rạng sáng hôm sau. Ca 2 quy đổi thành đoạn `[26,5 ; 30,5]`, rồi bị cắt về khung đêm nhờ `moc_dem_den` — trả đúng 2h biên + 1,5h lõi = **335.000đ**.
+
+**Đồng thời toàn bộ khung giờ được đưa ra Assumption thành tham số nhập tay**, thay cho bốn số cứng 22 / 24 / 28 / 30 của bản trước:
+
+| Named range | Mặc định | Ý nghĩa |
+|---|---|---|
+| `gio_dem_bat_dau` | 22:00 | Khung đêm bắt đầu |
+| `gio_dem_ket_thuc` | 06:00 | Khung đêm kết thúc (rạng sáng hôm sau) |
+| `gio_loi_bat_dau` | 00:00 | Khung lõi bắt đầu — đơn giá cao |
+| `gio_loi_ket_thuc` | 04:00 | Khung lõi kết thúc |
+| `moc_chia_ngay` | 12 | Giờ nhỏ hơn mốc này là rạng sáng hôm sau |
+
+Bốn mốc trên trục (`moc_dem_tu`, `moc_loi_tu`, `moc_loi_den`, `moc_dem_den`) giờ là **ô tự tính**, nền xám, không sửa tay. Ô `kiem_tra_khung` phải hiện "Hợp lệ"; nếu khung lõi bị đặt ra ngoài khung đêm thì nó báo lỗi ngay.
+
+**Nghĩa là: đổi chính sách chỉ cần sửa ô giờ, không đụng một công thức nào.** Đã chạy thử ba kịch bản:
+
+| Kịch bản | Ca 1 · 22:30–02:30 | Ca 2 · 02:30–06:30 |
+|---|---|---|
+| Khung 22:00–06:00, lõi 00–04 (hiện hành) | 1,5h biên + 2,5h lõi = **370.000** | 2h biên + 1,5h lõi = **335.000** |
+| Nới khung đêm tới 06:30 | 370.000 — không đổi | 2,5h biên + 1,5h lõi = **350.000** |
+| Đổi hẳn 21:00–07:00, lõi 23:00–03:00 | 0,5h biên + 3,5h lõi = **390.000** | 3,5h biên + 0,5h lõi = **330.000** |
+
+Phiếu PDF và bản xem trên màn hình **tự đọc nhãn khung giờ từ file** — đổi chính sách thì dòng "Khung biên 22:00–00:00 & 04:00–06:00" trên phiếu cũng đổi theo, không viết cứng trong mã.
+
+**Nhập giờ hệ 24:** mọi ô giờ định dạng `HH:mm` và có kiểm tra dữ liệu — gõ chữ hoặc AM/PM là Excel chặn ngay kèm thông báo tiếng Việt.
+
+> **VẪN CẦN FIN QUYẾT:** với khung hiện hành, ca 2 được trả 3,5h chứ không phải 4h — đoạn 06:00–06:30 nằm ngoài khung quy định nên không tính, mỗi đêm hụt 15.000đ. Ba hướng: (a) đổi lịch ca 2 thành 02:30–06:00, (b) sửa `gio_dem_ket_thuc` thành 06:30 — đây là **nới chính sách**, phải có văn bản duyệt, (c) giữ nguyên, coi 30 phút bàn giao là không tính tiền.
 
 **Ngày lễ:** cả phụ cấp giờ và BCA nhân `he_so_le` = 1,5. Kiểm chứng: 30.000×1,5 = 45.000 · 50.000×1,5 = 75.000 · 100.000×1,5 = 150.000 · 200.000×1,5 = 300.000 — trùng khít bảng trong .docx.
 
@@ -122,14 +161,18 @@ thay vì 310.000đ như ví dụ. **FIN chốt lại con số đúng.**
 **Named range đã đặt** (dùng được ở mọi công thức, đổi chính sách chỉ sửa một ô):
 
 ```
+NHẬP TAY (nền vàng)
 ky_ten · ky_bat_dau · ky_ket_thuc · loai_bang
+gio_dem_bat_dau · gio_dem_ket_thuc · gio_loi_bat_dau · gio_loi_ket_thuc · moc_chia_ngay
 rate_gio_bien · rate_gio_loi · he_so_le
 bca_spark · bca_blaze
 ops_0600_0800 · ops_0800_1800 · ops_1800_2200 · ops_2200_0100 · ops_0100_0600 · ops_phu_troi_le
 ops_kg_1nguoi · ops_nguoi_toi_da
-moc_dem_tu · moc_loi_tu · moc_loi_den · moc_dem_den
 giam_tru_ca_nhan_thang · giam_tru_phu_thuoc_thang · rate_khau_tru_vang_lai
 thue_rate_1..5 · thue_giam_1..5
+
+TỰ TÍNH (nền xám — không sửa tay)
+moc_dem_tu · moc_loi_tu · moc_loi_den · moc_dem_den · kiem_tra_khung
 ```
 
 **Cột tự kiểm tra** trong `Data`:
@@ -160,10 +203,14 @@ Toàn bộ công thức được tính lại độc lập ngoài Excel rồi đ�
 - 5 tình huống ca trực đêm trong bảng mục 2 — khớp bảng đơn giá trong .docx
 - Ca ngày lễ: đơn giá sau hệ số ra đúng 45.000 / 75.000 / 150.000 / 300.000
 - Ca kết thúc đúng 00:00 (22:00–24:00) — ra 2h biên, 0h lõi, Spark
+- Giờ lẻ tới từng phút: 22:30–02:30 · 23:15–05:45 · 23:45–04:15 · 22:10–22:40 — đúng hết
+- Ranh giới 06:00: ca kết thúc 05:00 · 05:59 · 06:00 · 06:01 · 06:30 · 07:00 — đúng hết sau khi sửa lỗi 8
+- Ba kịch bản đổi chính sách khung giờ ở mục 2b — chỉ sửa ô giờ, không đụng công thức
 - Phí OPS cả 5 khung giờ + phụ trội lễ
 - Thuế: `Khấu trừ 10%` trên 900.000 ra 90.000, thực nhận 810.000
-- Tổng kỳ mẫu: trực đêm 2.310.000 + OPS 2.600.000 = gross 4.910.000, thuế 150.000, **thực nhận 4.760.000**
+- Tổng kỳ mẫu: trực đêm 3.172.500 + OPS 2.400.000 = **gross 5.572.500**, 8 ca trực · 7 chuyến OPS
 - Chạy lại kiểm thử incentive cũ: 15 người, 345 job, thực nhận 314.788.696 — **không đổi**
+- 80 tiêu chí kiểm thử tự động, đạt toàn bộ
 
 ---
 

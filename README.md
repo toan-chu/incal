@@ -12,7 +12,7 @@ Hai loại phiếu: **incentive** theo quý và **phụ cấp trực đêm & OPS
 [![Excel là nguồn chân lý](https://img.shields.io/badge/Excel-Ngu%E1%BB%93n%20ch%C3%A2n%20l%C3%BD-147a50?logo=microsoftexcel&logoColor=white)](#-nguyên-tắc-vàng)
 [![PDF chữ thật](https://img.shields.io/badge/PDF-Ch%E1%BB%AF%20th%E1%BA%ADt%2C%20copy%20%C4%91%C6%B0%E1%BB%A3c-b42318?logo=adobeacrobatreader&logoColor=white)](#-nội-dung-phiếu)
 [![Dữ liệu không rời máy](https://img.shields.io/badge/D%E1%BB%AF%20li%E1%BB%87u-Kh%C3%B4ng%20r%E1%BB%9Di%20m%C3%A1y-a96200?logo=shieldsdotio&logoColor=white)](#-riêng-tư)
-[![Kiểm thử](https://img.shields.io/badge/Ki%E1%BB%83m%20th%E1%BB%AD-77%20ti%C3%AAu%20ch%C3%AD-32105e?logo=nodedotjs&logoColor=white)](#-kiểm-thử)
+[![Kiểm thử](https://img.shields.io/badge/Ki%E1%BB%83m%20th%E1%BB%AD-80%20ti%C3%AAu%20ch%C3%AD-32105e?logo=nodedotjs&logoColor=white)](#-kiểm-thử)
 
 </div>
 
@@ -41,7 +41,9 @@ incal/
 
 Nghĩa là: muốn sửa cách tính incentive hay phụ cấp → sửa trong Excel, không đụng tới công cụ. Công cụ không bao giờ là lý do khiến số bị sai.
 
-Với file phụ cấp, mọi đơn giá đều nằm ở sheet `Assumption` dưới dạng named range (`rate_gio_bien`, `bca_blaze`, `ops_2200_0100`…) — đổi chính sách chỉ sửa một ô, không đụng công thức.
+Với file phụ cấp, **cả đơn giá lẫn khung giờ** đều nằm ở sheet `Assumption` dưới dạng named range. Muốn đổi khung trực đêm từ 22:00–06:00 sang 21:00–07:00, hay nới tới 06:30 cho khớp lịch bàn giao? Sửa đúng ô giờ đó là xong — công thức tự bám theo, phiếu PDF cũng tự đổi nhãn. Không phải sửa một công thức nào.
+
+Giờ nhập theo **hệ 24 giờ** (`22:30`, `06:30`) — file có kiểm tra dữ liệu, gõ AM/PM là Excel chặn ngay.
 
 ---
 
@@ -249,8 +251,8 @@ Không có file đó thì bài kiểm thử in `BỎ QUA` và thoát sạch.
 
 | Sheet | Dùng để |
 |---|---|
-| `Assumption` | Tham số qua named range (`rate_gio_bien`, `bca_blaze`, `ops_*`…), bậc thuế và danh sách nhân sự. |
-| `Data` | Nhật ký ca `tbl_shifts` — nhận diện qua tiêu đề `Ngay`. Cột `Loai_Ca` tách `TRUC_DEM` / `OPS`. |
+| `Assumption` | Khung giờ (`gio_dem_bat_dau`, `gio_loi_ket_thuc`…), đơn giá (`rate_gio_bien`, `bca_blaze`, `ops_*`…), bậc thuế và danh sách nhân sự. Ô nền vàng nhập tay, ô nền xám tự tính. |
+| `Data` | Nhật ký ca `tbl_shifts` — nhận diện qua tiêu đề `Ngay`. Cột `Loai_Ca` tách `TRUC_DEM` / `OPS`. Ca qua đêm nhập giờ bình thường, công thức tự hiểu. |
 | `Calc_TrucDem` · `Calc_OPS` | Tổng hợp theo người, hiển thị trên phiếu. |
 | `Payout` | Bảng chi phụ cấp + thuế TNCN. |
 
